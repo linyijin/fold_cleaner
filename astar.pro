@@ -24,10 +24,14 @@ CONFIG += c++11
 
 SOURCES += \
         main.cpp \
-        mainwindow.cpp
+        mainwindow.cpp \
+    astar.cpp \
+    astar1.cpp
 
 HEADERS += \
-        mainwindow.h
+        mainwindow.h \
+    atar.h \
+    astar.h
 
 FORMS += \
         mainwindow.ui
