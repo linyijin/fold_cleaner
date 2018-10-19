@@ -21,6 +21,16 @@ signals:
 private slots:
     void on_pushButton_clicked();
     void onDrawPose(int x,int y,int type);
+
+    void on_pushButton_2_clicked();
+
+    void on_start_set_button_clicked();
+
+    void on_end_set_button_clicked();
+    void showPath(int len);
+    void resetAxis();
+    void showState(int type);//显示信息状态
+
 protected:
     void mousePressEvent(QMouseEvent *e);//添加按键检测事件，用于障碍物添加
 private:
@@ -29,6 +39,12 @@ private:
     QSize m_sceneSize;
     QSize m_cellSize;
     QLabel *MousePosLabel;//添加显示鼠标点击坐标
+    bool refresh;//清空
+    bool setStart=false;
+    bool firstStart=true;
+    bool setEnd=false;
+    bool firstEnd=true;
+    bool clickSet=false;
 };
 
 #endif // MAINWINDOW_H

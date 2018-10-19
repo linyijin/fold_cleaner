@@ -23,13 +23,15 @@ int Astar_1::calF(Point *p)
 }
 bool Astar_1::inMap(Point *p)
 {
-   // if ((p->x<0) || (p->y<0) || (p->x>79)|| (p->y>79) ||(map_[p->x][p->y]==8)  )
-    if ((p->x<0) || (p->y<0) || (p->x>79)|| (p->y>79))
+    if ((p->x<1) || (p->y<1) || (p->x>79)|| (p->y>79))
         return false;
+    return true;
 
 }
 Point *Astar_1::isInList(Point *p, std::list<Point*> &q)
 {
+    if(q.empty())
+        return NULL;
     for (auto iter : q)
     {
         if (iter->x == p->x && iter->y == p->y)
@@ -37,26 +39,39 @@ Point *Astar_1::isInList(Point *p, std::list<Point*> &q)
     }
     return NULL;
 }
-std::vector<Point *> Astar_1::nb8(Point *cur)
+std::vector<Point *> Astar_1::nb8(Point *cur)//找下一个点
 {
     std::vector<Point *> nbr;
     nbr.reserve(8);
-    for (int i = -1; i < 2; i++)
+
+    int x = cur->x ;
+    int y = cur->y ;
+    int right=2;
+    int left=-1;
+    int top=-1;
+    int down=2;
+    if(map_[x+1][y]==8)//旁边有障碍物直接将整行抛弃，无法穿行
+       right=1;
+    if(map_[x-1][y]==8)
+        left=0;
+    if(map_[x][y+1]==8)
+        down=1;
+    if(map_[x][y-1]==8)
+        top=0;
+    for (int i = left; i < right; i++)
     {
-        for (int j = -1; j < 2; j++)
+        for (int j = top; j < down; j++)
         {
 
             if (i == 0 && j == 0)//跳过当前重合节点
                 continue;
-
-            int x = cur->x + i;
-            int y = cur->y + j;
-            Point *p = new Point(x,y);
-            std::cout<<"before push the ner"<<std::endl;
-            std::cout<<x<<' '<<y<<std::endl;
-            if (inMap(p) && !isInList(p,closelist))//选取在地图中，不在close中的八近邻,open创建了一个新的副本，要注意区别
+//            if(abs(i)+abs(j)>1)//变为四近邻
+  //              continue;
+            int nx = cur->x+i ;
+            int ny = cur->y+j ;
+            Point *p = new Point(nx,ny);//p只承载x,y
+            if (inMap(p) && !isInList(p,closelist) && map_[p->x][p->y]!=8)//选取在地图中，不在close中的八近邻,open创建了一个新的副本，要注意区别
             {
-                std::cout<<"push the ner"<<std::endl;
                 nbr.push_back(new Point(p->x, p->y));
             }
             delete p;
@@ -80,16 +95,20 @@ Point *Astar_1::getLeastPoint(std::list<Point*> p)
 }
 Point * Astar_1::findPath(Point start_, Point end_)
 {
-    std::cout<<"search for path"<<std::endl;
+
     openlist.push_back(new Point(start_.x, start_.y));//创建新的start点:参数是两个int数据，需要开辟point空间
     while (!openlist.empty())
     {
-        std::cout<<"calculate openlist"<<std::endl;
+        //std::cout<<openlist.size()<<std::endl;
         auto current = getLeastPoint(openlist);//取出最小F值的open
         openlist.remove(current);
         closelist.push_back(current);
-
         auto nbr = nb8(current);
+        if(nbr.empty())
+        {
+            continue;//没有八近邻，不计算
+        }
+       // std::cout<<"find nb8"<<std::endl;
         for (auto &iter : nbr)//iter取出的是原来的值？
         {
             if (map_[iter->x][iter->y] == 8)//跳过障碍
@@ -118,19 +137,29 @@ Point * Astar_1::findPath(Point start_, Point end_)
                     iter->parent = current;
                 }
             }
-            Point * resPoint = isInList(&end_, openlist);
+            Point * resPoint = isInList(&end_, openlist);//判断是否在队列中
             if (resPoint)
                 return resPoint;//找到终点，直接返回终点
         }
     }
+    std::cout<<"failed"<<std::endl;
+    throw 1;//抛出异常
     return NULL;
 }
 std::list<Point *> Astar_1::getPath(Point start,Point end)
 {
-    std::cout<<"start calculate path"<<std::endl;
     std::list<Point*> path;//创建一个链表
-    Point * result = findPath(start, end);
-    //std::cout<<result->x<<' '<<result->y<<std::endl;
+    Point *result;
+    try
+    {
+        result = findPath(start, end);
+    }
+    catch(int i)
+    {
+         std::cout<<"error ocur"<<std::endl;//检验异常是否抛出
+         return path;//直接将path返回
+    }
+    std::cout<<"continue?"<<std::endl;
     while (result)//起点的父节点为NULL，可以作为退出循环条件
     {
         path.push_front(result);
@@ -140,7 +169,6 @@ std::list<Point *> Astar_1::getPath(Point start,Point end)
             sum += 10;//判定总里程
         result = result->parent;
     }
-    std::cout << "sum=" << sum << std::endl;
     if (!path.empty())
         return path;
 }
