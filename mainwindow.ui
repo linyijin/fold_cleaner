@@ -30,12 +30,12 @@
      <string>calculate</string>
     </property>
    </widget>
-   <widget class="QPlainTextEdit" name="end_point">
+   <widget class="QPlainTextEdit" name="end_x">
     <property name="geometry">
      <rect>
-      <x>50</x>
+      <x>60</x>
       <y>60</y>
-      <width>111</width>
+      <width>31</width>
       <height>31</height>
      </rect>
     </property>
@@ -50,28 +50,28 @@
      </rect>
     </property>
     <property name="text">
-     <string>start</string>
+     <string>start_x</string>
     </property>
    </widget>
    <widget class="QLabel" name="end">
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>50</y>
+      <y>60</y>
       <width>41</width>
       <height>31</height>
      </rect>
     </property>
     <property name="text">
-     <string>end</string>
+     <string>end_x</string>
     </property>
    </widget>
-   <widget class="QPlainTextEdit" name="start_point">
+   <widget class="QPlainTextEdit" name="start_x">
     <property name="geometry">
      <rect>
-      <x>50</x>
+      <x>60</x>
       <y>10</y>
-      <width>111</width>
+      <width>31</width>
       <height>31</height>
      </rect>
     </property>
@@ -93,6 +93,65 @@
       <width>571</width>
       <height>571</height>
      </size>
+    </property>
+   </widget>
+   <widget class="QLabel" name="start_2">
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>10</y>
+      <width>41</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>start_y</string>
+    </property>
+   </widget>
+   <widget class="QPlainTextEdit" name="start_y">
+    <property name="geometry">
+     <rect>
+      <x>150</x>
+      <y>10</y>
+      <width>31</width>
+      <height>31</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="end_2">
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>60</y>
+      <width>41</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>end_y</string>
+    </property>
+   </widget>
+   <widget class="QPlainTextEdit" name="end_y">
+    <property name="geometry">
+     <rect>
+      <x>150</x>
+      <y>60</y>
+      <width>31</width>
+      <height>31</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_2">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>180</y>
+      <width>75</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>reset</string>
     </property>
    </widget>
   </widget>

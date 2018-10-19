@@ -23,7 +23,6 @@ int Astar_1::calF(Point *p)
 }
 bool Astar_1::inMap(Point *p)
 {
-   // if ((p->x<0) || (p->y<0) || (p->x>79)|| (p->y>79) ||(map_[p->x][p->y]==8)  )
     if ((p->x<0) || (p->y<0) || (p->x>79)|| (p->y>79))
         return false;
 
@@ -52,11 +51,8 @@ std::vector<Point *> Astar_1::nb8(Point *cur)
             int x = cur->x + i;
             int y = cur->y + j;
             Point *p = new Point(x,y);
-            std::cout<<"before push the ner"<<std::endl;
-            std::cout<<x<<' '<<y<<std::endl;
             if (inMap(p) && !isInList(p,closelist))//选取在地图中，不在close中的八近邻,open创建了一个新的副本，要注意区别
             {
-                std::cout<<"push the ner"<<std::endl;
                 nbr.push_back(new Point(p->x, p->y));
             }
             delete p;
@@ -80,11 +76,10 @@ Point *Astar_1::getLeastPoint(std::list<Point*> p)
 }
 Point * Astar_1::findPath(Point start_, Point end_)
 {
-    std::cout<<"search for path"<<std::endl;
+
     openlist.push_back(new Point(start_.x, start_.y));//创建新的start点:参数是两个int数据，需要开辟point空间
     while (!openlist.empty())
     {
-        std::cout<<"calculate openlist"<<std::endl;
         auto current = getLeastPoint(openlist);//取出最小F值的open
         openlist.remove(current);
         closelist.push_back(current);

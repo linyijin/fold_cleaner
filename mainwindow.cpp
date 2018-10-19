@@ -16,7 +16,9 @@ MainWindow::MainWindow(QMainWindow*parent) :
     ui->setupUi(this);
     astar=new Astar();
     //绑定信号/槽
+   // connect(ui->pushButton,SIGNAL(clicked()),astar,SLOT(setStart(int,int,int,int)));//设置起点终点
     connect(ui->pushButton,SIGNAL(clicked()),astar,SLOT(calculate()));
+    connect(ui->pushButton_2,SIGNAL(clicked()),astar,SLOT(resetMap()));
     connect(this,SIGNAL(obstacleset(int,int)),astar,SLOT(obstacleset(int,int)));//绑定当前函数与astar的函数
     connect(astar,SIGNAL(onDrawPose(int,int,int)),this,SLOT(onDrawPose(int,int,int)));
 
@@ -47,9 +49,42 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::on_pushButton_clicked()
+void MainWindow::on_pushButton_clicked()//直接让clicked函数中调用astar
 {
-     ui->pushButton->setText(tr("close"));
+     auto start_x_string=ui->start_x->toPlainText();
+     auto start_y_string=ui->start_y->toPlainText();
+     auto end_x_string=ui->end_x->toPlainText();
+     auto end_y_string=ui->end_y->toPlainText();
+     auto string2int =[](char ch){
+         if(ch>'0' && ch<'9')
+             return (int)(ch-'0');
+     };
+    int len1=start_x_string.length();
+    int start_x=0;
+    for(int i=len1-1;i>=0;i--){
+        char ch=start_x_string[i].toLatin1();
+        start_x+=string2int(ch)*((len1-i-1)*10);
+    }
+    int len2=start_y_string.length();
+    int start_y=0;
+    for(int i=len2-1;i>=0;i--){
+        char ch=start_y_string[i].toLatin1();
+        start_y+=string2int(ch)*((len2-i-1)*10);
+    }
+    int len3=end_x_string.length();
+    int end_x=0;
+    for(int i=len3-1;i>=0;i--){
+        char ch=end_x_string[i].toLatin1();
+        end_x+=string2int(ch)*((len3-i-1)*10);
+    }
+    int len4=end_y_string.length();
+    int end_y=0;
+    for(int i=len4-1;i>=0;i--){
+        char ch=end_y_string[i].toLatin1();
+        end_y+=string2int(ch)*((len4-i-1)*10);
+    }
+    astar->setStart(start_x,start_y,end_x,end_y);//直接调用对象
+
 
 }
 
@@ -119,4 +154,6 @@ void MainWindow::mousePressEvent(QMouseEvent *e)
         MousePosLabel->setText(tr("障碍选择位置：")+str);
     }
 }
-
+void MainWindow::on_pushButton_2_clicked()
+{
+}
