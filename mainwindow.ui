@@ -144,13 +144,8 @@
    <widget class="QPushButton" name="pushButton_2">
     <property name="geometry">
      <rect>
-<<<<<<< HEAD
       <x>120</x>
       <y>110</y>
-=======
-      <x>30</x>
-      <y>180</y>
->>>>>>> 38aae4596c79052150bb85134eab3c654af7ab02
       <width>75</width>
       <height>31</height>
      </rect>
@@ -159,7 +154,6 @@
      <string>reset</string>
     </property>
    </widget>
-<<<<<<< HEAD
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
@@ -232,8 +226,19 @@
      <string>状态信息</string>
     </property>
    </widget>
-=======
->>>>>>> 38aae4596c79052150bb85134eab3c654af7ab02
+   <widget class="QPushButton" name="foldstart">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>150</y>
+      <width>75</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>弓字清扫</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">

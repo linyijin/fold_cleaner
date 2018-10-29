@@ -1,25 +1,31 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "planner.h"
+#include "move.h"
 
 #include<cstdlib>
-
-//#include <qgraphicsitem.h>
 #include<QtGui>//mousetrack
 #include <QGraphicsRectItem>
-#include "atar.h"
 #include<iostream>
 #include<QTextStream>
 #include<stdio.h>
 #include<QTWidgets/QVBoxLayout>
+
+
 using std::cout;
 MainWindow::MainWindow(QMainWindow*parent) :
     QMainWindow(parent),
     //QWidget(parent),
     ui(new Ui::MainWindow)
 {
+    timer=new QTimer(this);
+    timer->start(1000);
     setWindowTitle(tr("路径规划演示"));
     ui->setupUi(this);
     astar=new Astar();
+    move=new Move(1,0);//设置一个新的运动对象,包括速度
+    //设置当前位置
+   // move->setCurPos(40,40);
     //绑定信号/槽
    // connect(ui->pushButton,SIGNAL(clicked()),astar,SLOT(setStart(int,int,int,int)));//设置起点终点
     connect(ui->pushButton,SIGNAL(clicked()),astar,SLOT(calculate()));
@@ -30,6 +36,12 @@ MainWindow::MainWindow(QMainWindow*parent) :
     connect(astar,SIGNAL(resetAxis()),this,SLOT(resetAxis()));
     connect(astar,SIGNAL(showState(int)),this,SLOT(showState(int)));
 
+    //connect(move,SIGNAL(velUpdate(int,int)),this,SLOT(VelUpdate(int,int)));//绑定运动对象更新事件
+    connect(timer,SIGNAL(timeout()),move,SLOT(posUpdate()));//计数结束通知Move更新
+    connect(move,SIGNAL(onDrawPose(int,int,int)),this,SLOT(onDrawPose(int,int,int)));//绑定move的绘制事件
+
+
+
     //绘制网格地图
     m_sceneSize =QSize(571,571);
     m_cellSize=m_sceneSize/80;
@@ -38,6 +50,7 @@ MainWindow::MainWindow(QMainWindow*parent) :
     ui->map->setScene(scene);
     drawGridMap();
     //鼠标坐标显示标签
+/*
     MousePosLabel=new QLabel;
     MousePosLabel->setText(tr("obstacle point"));
     QVBoxLayout *layoutV1=new QVBoxLayout();
@@ -47,6 +60,7 @@ MainWindow::MainWindow(QMainWindow*parent) :
     mainlayout->addStretch();
     mainlayout->addLayout(layoutV1);
     setLayout(mainlayout);
+*/
     //map追踪鼠标
     ui->map->setMouseTracking(true);
 
@@ -119,22 +133,22 @@ void MainWindow::onDrawPose(int x,int y,int type)
         QColor color(255, 255, 255);
         switch (type) {
             case 0:
-                color.setRgb(0xFFFFFF);
+                color.setRgb(0xFFFFFF);//白色
                 break;
             case 8:
-                color.setRgb(0, 0, 0);
+                color.setRgb(0, 0, 0);//黑色
                 break;
             case 1:
-                color.setRgb(0, 128, 255);
+                color.setRgb(0, 128, 255);//蓝色
                 break;
             case 2:
-                color.setRgb(0xADFF2F);
+                color.setRgb(0xADFF2F);//绿色
                 break;
             case 4:
-                color.setRgb(0xEE0000);//3画不出来？
+                color.setRgb(0xEE0000);//3画不出来？红色
                 break;
             default:
-                color.setRgb(255, 255, 255);
+                color.setRgb(255, 255, 255);//白色
                 break;
         }
         itemRect->setBrush(QBrush(color));
@@ -196,11 +210,12 @@ void MainWindow::mousePressEvent(QMouseEvent *e)
              }
         }
     }
-
+/*
     if(e->button()==Qt::LeftButton)
     {
         MousePosLabel->setText(tr("障碍选择位置：")+str);
     }
+    */
 }
 void MainWindow::on_pushButton_2_clicked()
 {
@@ -270,6 +285,19 @@ void MainWindow::resetAxis()//清空操作要重新写
 void MainWindow::showState(int type)
 {
     switch(type)
+    {
     case 0:
         ui->state->setPlainText("can't find path,something wrong");
+        break;
+    default:
+        ui->state->setPlainText(("ok"));
+        break;
+     }
+}
+//时钟更新
+void MainWindow::VelUpdate(const int vl, const int va)
+{
+    //std::cout<<"set timer"<<std::endl;
+    timer->start(0.2/vl*100000);//设置计时扩大到秒级
+
 }

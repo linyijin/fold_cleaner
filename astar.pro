@@ -25,13 +25,15 @@ CONFIG += c++11
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
+    planner.cpp \
     astar.cpp \
-    astar1.cpp
+    move.cpp
 
 HEADERS += \
         mainwindow.h \
-    atar.h \
-    astar.h
+    astar.h \
+    planner.h \
+    move.h
 
 FORMS += \
         mainwindow.ui
