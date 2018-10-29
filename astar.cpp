@@ -10,6 +10,7 @@ Astar::Astar(){
 Astar::~Astar(){
 
 }
+<<<<<<< HEAD
 void Astar::setStart(int start_x, int start_y)
 {
     start.x=start_x;
@@ -29,6 +30,17 @@ void Astar::setEnd(int end_x,int end_y)
 }
 void Astar::calculate()//相当于main函数
 {
+=======
+void Astar::setStart(int start_x, int start_y, int end_x, int end_y)
+{
+    start.x=start_x;
+    start.y=start_y;
+    end.x=end_x;
+    end.y=end_y;
+}
+void Astar::calculate()//相当于main函数
+{
+>>>>>>> 38aae4596c79052150bb85134eab3c654af7ab02
     Astar_1 astar_1;
     astar_1.initAstar(costmap_);
     std::list<Point *>path_=astar_1.getPath(start, end);
@@ -43,7 +55,11 @@ void Astar::calculate()//相当于main函数
     for (auto &p : path_)
             costmap_[p->x][p->y] = 1;
     costmap_[start.x][start.y]=2;
+<<<<<<< HEAD
     costmap_[end.x][end.y]=4;
+=======
+    costmap_[end.x][end.y]=2;
+>>>>>>> 38aae4596c79052150bb85134eab3c654af7ab02
     for(int i=0;i<80;i++){
         for(int j=0;j<80;j++)
         {
@@ -61,6 +77,7 @@ void Astar::resetMap()
     for(int i=0;i<80;i++){
         for(int j=0;j<80;j++)
         {
+<<<<<<< HEAD
             costmap_[i][j]=0;
              emit onDrawPose(i,j,costmap_[i][j]);//给mainwidow绘制
         }
@@ -74,15 +91,22 @@ void Astar::resetMapEnd()
         for(int j=0;j<80;j++)
         {
             if(costmap_[i][j]==2)
+=======
+            if(costmap_[i][j]==8)
+>>>>>>> 38aae4596c79052150bb85134eab3c654af7ab02
                 continue;
             costmap_[i][j]=0;
              emit onDrawPose(i,j,costmap_[i][j]);//给mainwidow绘制
         }
     }
 }
+<<<<<<< HEAD
 int Astar::getPathLen()
 {
     return path_len;
 }
+=======
+//算法成员函数
+>>>>>>> 38aae4596c79052150bb85134eab3c654af7ab02
 
 
