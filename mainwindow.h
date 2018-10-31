@@ -23,6 +23,7 @@ signals:
 private slots:
     void on_pushButton_clicked();
     void onDrawPose(int x,int y,int type);
+    void onDrawPath(int x1,int y1,int x2,int y2,int type);
 
     void on_pushButton_2_clicked();
 
@@ -37,6 +38,8 @@ private slots:
 
   //  void posUpdate();
 
+
+    void on_foldstart_clicked();
 
 protected:
     void mousePressEvent(QMouseEvent *e);//添加按键检测事件，用于障碍物添加
@@ -54,6 +57,7 @@ private:
     bool firstEnd=true;
     bool clickSet=false;
     QTimer *timer;//定义一个更新时钟
+    QTimer *timer2;//定义第二个时钟用来刷新运动
 
 };
 

@@ -39,7 +39,7 @@ Point *Astar_1::isInList(Point *p, std::list<Point*> &q)
     }
     return NULL;
 }
-std::vector<Point *> Astar_1::nb8(Point *cur)//找下一个点
+std::vector<Point *> Astar_1::nb_8(Point *cur)//找下一个点
 {
     std::vector<Point *> nbr;
     nbr.reserve(8);
@@ -103,7 +103,7 @@ Point * Astar_1::findPath(Point start_, Point end_)
         auto current = getLeastPoint(openlist);//取出最小F值的open
         openlist.remove(current);
         closelist.push_back(current);
-        auto nbr = nb8(current);
+        auto nbr = nb_8(current);
         if(nbr.empty())
         {
             continue;//没有八近邻，不计算
@@ -113,6 +113,20 @@ Point * Astar_1::findPath(Point start_, Point end_)
         {
             if (map_[iter->x][iter->y] == 8)//跳过障碍
                 continue;
+            bool passable=false;
+            auto nbr_nb=simple_nb(iter);//判断是否是个可以通过的点
+            for(auto &iter_nbr : nbr_nb)
+            {
+                if(map_[iter_nbr->x][iter_nbr->y]==8)
+                    passable=true;
+            }
+          // if(nbr_nb.size()==9)
+            //   passable=true;
+            if(passable)//八近邻有障碍，不能通过
+            {
+               // std::cout<<"not a passable point"<<std::endl;
+                continue;
+            }
             if (!isInList(iter,openlist))//不在openlist中
             {
 
@@ -170,4 +184,22 @@ std::list<Point *> Astar_1::getPath(Point start,Point end)
     }
     if (!path.empty())
         return path;
+}
+std::vector<Point *> Astar_1::simple_nb(Point *cur)//简单地收入八近邻，包括自身
+{
+            std::vector<Point *> nbr8;
+            for(int i=-1;i<2;i++)
+            {
+                for(int j=-1;j<2;j++)
+                {
+                    if(i==0 && j==0)
+                        nbr8.push_back(cur);//当前点不再建立空间
+                    else
+                    {
+                        Point *nbr=new Point(cur->x+i,cur->y+j);
+                        nbr8.push_back(nbr);//存入数组
+                    }
+                }
+            }
+            return nbr8;
 }

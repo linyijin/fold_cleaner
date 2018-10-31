@@ -2,10 +2,15 @@
 #include "astar.h"
 #include<iostream>
 #include<math.h>
-std::vector<std::vector<int>> costmap_(80, std::vector<int>(80, 0));//定义一个接收地图的函数
+//extern std::vector<std::vector<int>> costmap_(80, std::vector<int>(80, 0));//定义一个接收地图的函数
+extern std::vector<std::vector<int>> costmap_;
 Point start(0,0);
 Point end(0,0);//用全局定义
 Astar::Astar(){
+}
+Astar::Astar(std::vector<std::vector<int>> &costmap)//将主窗口地图送来,送地址
+{
+    costmap_=costmap;
 }
 Astar::~Astar(){
 
@@ -40,8 +45,13 @@ void Astar::calculate()//相当于main函数
     }
     path_len=path_.size();
     emit showPath(path_len);//发送路径长度
+    Point *last=path_.front();//记录上一个点
     for (auto &p : path_)
-            costmap_[p->x][p->y] = 1;
+    {
+      emit onDrawPath(last->x,last->y,p->x,p->y,1);
+        last=p;
+     //costmap_[p->x][p->y] = 1;
+    }
     costmap_[start.x][start.y]=2;
     costmap_[end.x][end.y]=4;
     for(int i=0;i<80;i++){
@@ -61,7 +71,12 @@ void Astar::resetMap()
     for(int i=0;i<80;i++){
         for(int j=0;j<80;j++)
         {
-            costmap_[i][j]=0;
+            if(i==0 || j==0||i==79 ||j==79)
+                costmap_[i][j]=8;
+            else if(costmap_[i][j]==4)
+                continue;
+            else
+                costmap_[i][j]=0;
              emit onDrawPose(i,j,costmap_[i][j]);//给mainwidow绘制
         }
     }
@@ -73,7 +88,7 @@ void Astar::resetMapEnd()
     for(int i=0;i<80;i++){
         for(int j=0;j<80;j++)
         {
-            if(costmap_[i][j]==2)
+            if(costmap_[i][j]==2 || costmap_[i][j]==8 || costmap_[i][j]==4)
                 continue;
             costmap_[i][j]=0;
              emit onDrawPose(i,j,costmap_[i][j]);//给mainwidow绘制

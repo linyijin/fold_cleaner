@@ -27,13 +27,17 @@ SOURCES += \
         mainwindow.cpp \
     planner.cpp \
     astar.cpp \
-    move.cpp
+    move.cpp \
+    search.cpp \
+    pose2d.cpp
 
 HEADERS += \
         mainwindow.h \
     astar.h \
     planner.h \
-    move.h
+    move.h \
+    search.h \
+    pose2d.h
 
 FORMS += \
         mainwindow.ui

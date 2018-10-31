@@ -3,6 +3,7 @@
 #include<iostream>
 #include<vector>
 #include<list>
+
 const int lcost = 10;
 const int tcost = 14;
 struct Point {
@@ -21,7 +22,8 @@ private:
     int calG(Point *p,Point *start);
     int calF(Point *p);
     int calH(Point *p, Point *end);
-    std::vector<Point *> nb8(Point *cur);//八近邻，放着八个指针
+    std::vector<Point *> nb_8(Point *cur);//八近邻，放着八个指针
+    std::vector<Point *> simple_nb(Point *cur);
     std::list<Point*> openlist;
     std::list<Point*> closelist;
     Point* isInList(Point *p, std::list<Point*> &q);

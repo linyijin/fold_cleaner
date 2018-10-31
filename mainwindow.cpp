@@ -11,7 +11,7 @@
 #include<stdio.h>
 #include<QTWidgets/QVBoxLayout>
 
-
+std::vector<std::vector<int>> costmap_(80, std::vector<int>(80, 0));
 using std::cout;
 MainWindow::MainWindow(QMainWindow*parent) :
     QMainWindow(parent),
@@ -19,11 +19,13 @@ MainWindow::MainWindow(QMainWindow*parent) :
     ui(new Ui::MainWindow)
 {
     timer=new QTimer(this);
-    timer->start(1000);
-    setWindowTitle(tr("路径规划演示"));
+    timer->start(50);
+    timer2=new QTimer(this);
+   // setWindowTitle(tr("路径规划演示"));
     ui->setupUi(this);
     astar=new Astar();
-    move=new Move(1,0);//设置一个新的运动对象,包括速度
+    move=new Move();//设置一个新的运动对象,包括地图
+
     //设置当前位置
    // move->setCurPos(40,40);
     //绑定信号/槽
@@ -32,18 +34,22 @@ MainWindow::MainWindow(QMainWindow*parent) :
     connect(ui->pushButton_2,SIGNAL(clicked()),astar,SLOT(resetMap()));
     connect(this,SIGNAL(obstacleset(int,int)),astar,SLOT(obstacleset(int,int)));//绑定当前函数与astar的函数
     connect(astar,SIGNAL(onDrawPose(int,int,int)),this,SLOT(onDrawPose(int,int,int)));
+    connect(astar,SIGNAL(onDrawPath(int,int,int,int,int)),this,SLOT(onDrawPath(int,int,int,int,int)));
     connect(astar,SIGNAL(showPath(int)),this,SLOT(showPath(int)));//绑定显示信号
     connect(astar,SIGNAL(resetAxis()),this,SLOT(resetAxis()));
     connect(astar,SIGNAL(showState(int)),this,SLOT(showState(int)));
+    connect(move,SIGNAL(showState(int)),this,SLOT(showState(int)));
 
     //connect(move,SIGNAL(velUpdate(int,int)),this,SLOT(VelUpdate(int,int)));//绑定运动对象更新事件
     connect(timer,SIGNAL(timeout()),move,SLOT(posUpdate()));//计数结束通知Move更新
     connect(move,SIGNAL(onDrawPose(int,int,int)),this,SLOT(onDrawPose(int,int,int)));//绑定move的绘制事件
 
+    connect(timer2,SIGNAL(timeout()),move,SLOT(fold()));
+
 
 
     //绘制网格地图
-    m_sceneSize =QSize(571,571);
+    m_sceneSize =QSize(581,581);
     m_cellSize=m_sceneSize/80;
     QGraphicsScene *scene=new QGraphicsScene();
     scene->setSceneRect(0,0,m_sceneSize.width(),m_sceneSize.height());
@@ -115,7 +121,8 @@ void MainWindow::on_pushButton_clicked()//直接让clicked函数中调用astar
 
 
 }
-
+//绘制函数
+//绘制点
 void MainWindow::onDrawPose(int x,int y,int type)
 {
     //std::cout<<"draw"<<x<<' '<<y<<' '<<type<<std::endl;
@@ -139,13 +146,18 @@ void MainWindow::onDrawPose(int x,int y,int type)
                 color.setRgb(0, 0, 0);//黑色
                 break;
             case 1:
-                color.setRgb(0, 128, 255);//蓝色
+                color.setRgb(0, 128, 255);//蓝色00EEEE
+               // color.setRgb(0x00EEEE);
                 break;
             case 2:
                 color.setRgb(0xADFF2F);//绿色
                 break;
+            case 3:
+                color.setRgb(0xEE9A00);//橙色
+              //  color.setRgb(0xADFF2F);
+                break;
             case 4:
-                color.setRgb(0xEE0000);//3画不出来？红色
+                color.setRgb(0xEE0000);//红色
                 break;
             default:
                 color.setRgb(255, 255, 255);//白色
@@ -154,6 +166,23 @@ void MainWindow::onDrawPose(int x,int y,int type)
         itemRect->setBrush(QBrush(color));
         //itemRect->setPen(QPen(color));
     }
+}
+void MainWindow::onDrawPath(int x1, int y1, int x2, int y2, int type)
+{
+    QColor color(255,255,255);
+    switch(type)
+    {
+        case 0:
+            color.setRgb(0xFFFFFF);
+             break;
+       case 1:
+            color.setRgb(0,128,255);
+            break;
+        default:
+            break;
+    }
+    QGraphicsScene *scene=ui->map->scene();
+    scene->addLine(x1*m_cellSize.width()+4,y1*m_cellSize.height()+4,x2*m_cellSize.width()+4,y2*m_cellSize.height()+4,QPen(color));
 }
 void MainWindow::drawGridMap()//绘制空白地图
 {
@@ -168,19 +197,21 @@ void MainWindow::drawGridMap()//绘制空白地图
 
     }
 }
+//鼠标点击事件
 void MainWindow::mousePressEvent(QMouseEvent *e)
 {
     QString str="("+QString::number(e->x())+","+QString::number(e->y())+")";
-    if(e->x()>300 && e->x()<871 && e->y()>10 && e->y()<581)//障碍设置条件
+    if(e->x()>225 && e->x()<871 && e->y()>10 && e->y()<581)//障碍设置条件
     {
-        //std::cout<<"mouse"<<e->x()<<' '<<e->y()<<std::endl;
-        int x=(e->x()-300)/m_cellSize.width()+1;//修正点击坐标
-        int y=(e->y()-10)/m_cellSize.height()-1;
+       // std::cout<<"mouse"<<e->x()<<' '<<e->y()<<std::endl;
+        int x=(e->x()-225)/m_cellSize.width()+1;//修正点击坐标200
+        int y=(e->y()-8)/m_cellSize.height()-1;//10
         if(setStart || setEnd)
         {
             if(setStart)
             {
                 astar->setStart(x,y);
+                move->setCurPos(x,y);
                 char axis[5];
                 itoa(x,axis,10);
                 ui->start_x->setPlainText(axis);
@@ -289,6 +320,12 @@ void MainWindow::showState(int type)
     case 0:
         ui->state->setPlainText("can't find path,something wrong");
         break;
+    case 1:
+        ui->state->setPlainText("move is running");
+        break;
+    case 2:
+        ui->state->setPlainText("bumps");
+        break;
     default:
         ui->state->setPlainText(("ok"));
         break;
@@ -300,4 +337,9 @@ void MainWindow::VelUpdate(const int vl, const int va)
     //std::cout<<"set timer"<<std::endl;
     timer->start(0.2/vl*100000);//设置计时扩大到秒级
 
+}
+
+void MainWindow::on_foldstart_clicked()
+{
+    timer2->start(100);
 }
