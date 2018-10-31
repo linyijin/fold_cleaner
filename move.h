@@ -41,6 +41,7 @@ public:
     void fold_move();
     void fold_turn();
     void fold_turnBack();//完成转弯
+    state fold_follow();//沿墙:绕过障碍物 重复清扫进入导航，返回
     state fold_nav();
 
     //碰撞处理函数
@@ -60,7 +61,6 @@ private:
     std::vector<Point *> body;//机体信息
     Point *curPos=new Point;
     Point *lastPos=new Point;
-    int lastTheta;
     int bump_type;//碰撞类型
 };
 

@@ -22,6 +22,7 @@ Move::Move(const int vl,const int va)
     body=nb8(curPos);
     lastPos->x=curPos->x;
     lastPos->y=curPos->y;
+    lastPos->theta=curPos->theta;
 
 }
 Move::Move(std::vector<std::vector<int>> &map)
@@ -32,6 +33,7 @@ Move::Move(std::vector<std::vector<int>> &map)
     body=nb8(curPos);
     lastPos->x=curPos->x;
     lastPos->y=curPos->y;
+    lastPos->theta=curPos->theta;
     //map_=map;
 }
 Point *Move::getPose() const
@@ -63,12 +65,12 @@ void Move::posUpdate()//根据curpos绘制机体,更新机体
             else
             {
                 costmap_[iter->x][iter->y]=1;
-                emit onDrawPose(iter->x,iter->y,1);//绘制为4
+                emit onDrawPose(iter->x,iter->y,1);//机体其他部分绘制为蓝色
             }
         }
-    lastPos->x=curPos->x;
-    lastPos->y=curPos->y;
-    lastPos->theta=curPos->theta;
+    //lastPos->x=curPos->x;
+    //lastPos->y=curPos->y;
+    //lastPos->theta=curPos->theta;
     //curPos->x++;
     //delete test;
 }
@@ -84,7 +86,7 @@ state Move::fold_run()
     int delta_x=body[curPos->theta]->x-curPos->x;
     int delta_y=body[curPos->theta]->y-curPos->y;
     //直线碰撞判断
-    if(delta_x!=0)//x轴上有位移,直线运动
+    if(delta_x!=0 && delta_y==0)//x轴上直线位移
     {
         if(costmap_[body[curPos->theta]->x+delta_x*1][body[curPos->theta]->y]==8 )
         {
@@ -105,12 +107,18 @@ state Move::fold_run()
             return running;
     }
     //转弯碰撞判断
-    if(delta_y!=0)//y轴上有位移，转弯运动
+    if(delta_y!=0 && delta_x==0)//y轴上直线运动
     {
-
-        if(costmap_[body[curPos->theta]->x][body[curPos->theta]->y+delta_y*1]==8)
+        if(costmap_[body[curPos->theta]->x][body[curPos->theta]->y+delta_y*1]==8 ||
+                ((costmap_[body[curPos->theta]->x-1][body[curPos->theta]->y+delta_y*1]==8)&&
+                 (costmap_[body[curPos->theta]->x+1][body[curPos->theta]->y+delta_y*1]==8)))
             {
                 bump_type=6;
+                return turn_bump;
+            }
+        else if(costmap_[body[curPos->theta]->x-1][body[curPos->theta]->y+delta_y*1]==8)
+            {
+                bump_type=4;//左边碰撞
                 return turn_bump;
             }
         else if(costmap_[body[curPos->theta]->x+1][body[curPos->theta]->y+delta_y*1]==8)
@@ -118,11 +126,7 @@ state Move::fold_run()
             bump_type=5;//右边碰撞
             return turn_bump;
         }
-        else if(costmap_[body[curPos->theta]->x-1][body[curPos->theta]->y+delta_y*1]==8)
-            {
-                bump_type=4;//左边碰撞
-                return turn_bump;
-            }
+
         else
         {
             return turn_finish;
@@ -137,7 +141,7 @@ void Move::fold_move()
      int delta_x=body[curPos->theta]->x-curPos->x;
      lastPos->x=curPos->x;
      lastPos->y=curPos->y;
-     lastTheta=curPos->theta;
+     lastPos->theta=curPos->theta;
      curPos->x=curPos->x+delta_x*1;
      body=nb8(curPos);//生成新的机体
 }
@@ -146,35 +150,51 @@ void Move::fold_turn()//转弯
     int delta_x=body[curPos->theta]->x-curPos->x;
     if(delta_x>0)
     {
-        lastTheta=right;//记录上一个姿态
+        lastPos->theta=right;//记录上一个姿态
+        lastPos->y=curPos->y;
+        lastPos->x=lastPos->x;
         curPos->theta=buttom;
+        curPos->y=curPos->y;//完成第一步前进
+        body=nb8(curPos);
 
     }
     else if(delta_x<0)
     {
-        lastTheta=left;
+        lastPos->theta=left;
+        lastPos->y=curPos->y;
+        lastPos->x=lastPos->x;
         curPos->theta=buttom;
-
+        curPos->y=curPos->y;//完成第一步前进
+        body=nb8(curPos);
     }
 
 }
 void Move::fold_turnBack()//完成转弯
 {
-    std::cout<<lastPos->theta<<std::endl;
-    if(lastTheta==right)
+    //std::cout<<lastPos->theta<<std::endl;
+    if(lastPos->theta==right)
     {
-        lastTheta=curPos->theta;
+        lastPos->theta=curPos->theta;
+        lastPos->x=curPos->x;
+        lastPos->y=curPos->y;
         curPos->theta=left;
         curPos->y=curPos->y+1;
         body=nb8(curPos);
     }
-    else if(lastTheta==left)
+    else if(lastPos->theta==left)
     {
-        lastTheta=curPos->theta;
+        //lastTheta=curPos->theta;
+        lastPos->theta=curPos->theta;
+        lastPos->x=curPos->x;
+        lastPos->y=curPos->y;
         curPos->theta=right;
         curPos->y=curPos->y+1;
         body=nb8(curPos);
     }
+}
+state Move::fold_follow()
+{
+
 }
 state Move::fold_nav()//路径规划
 {
@@ -185,7 +205,36 @@ void Move::bumpHandle(const int bump_type)
 {
     switch(bump_type)
     {
-     //   case 4:
+        case 4://左边有障碍
+        {
+            lastPos->x=curPos->x;//方向先不更新
+            lastPos->y=curPos->y;
+            curPos->x=curPos->x+1;
+            curPos->y=curPos->y+1;//左边四十五度转弯
+            body=nb8(curPos);
+            break;
+        }
+    case 5://右边有障碍
+        {
+            lastPos->x=curPos->x;
+            lastPos->y=curPos->y;
+            curPos->x=curPos->x-1;
+            curPos->y=curPos->y+1;//右边四十五度转弯
+            body=nb8(curPos);
+            break;
+        }
+    case 6://下边有障碍
+        {
+            lastPos->x=curPos->x;
+            lastPos->y=curPos->y;
+            if(lastPos->theta==right)
+                curPos->theta=left;
+            else if(lastPos->theta=left)
+                curPos->theta=right;
+            body=nb8(curPos);
+            break;
+        }
+
 
     }
 }
@@ -202,11 +251,16 @@ void Move::fold()
         fold_turn();
         break;
     case turn_finish:
-        fold_turnBack();
-        break;
+    {
+       fold_turnBack();
+    }
     case turn_bump:
-        fold_nav();
+    {
+        bumpHandle(bump_type);
+        fold_follow();//转入follow模式
+        //fold_nav();
         break;
+    }
      default:
         break;
     }
