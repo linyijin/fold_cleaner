@@ -5,6 +5,7 @@
 #include <QtCore/QTime>
 #include <queue>
 #include "qobject.h"
+#include "astar.h"
 #include<vector>
 #include<list>
 
@@ -17,6 +18,7 @@ public:
     Astar(std::vector<std::vector<int>> &costmap);
     ~Astar();
     int getPathLen();
+    std::vector<Point *> returnPath();
 signals:
     void onDrawPose(int x,int y,int type);
     void onDrawPath(int x1,int y1,int x2,int y2,int type);
@@ -32,6 +34,7 @@ public slots:
     void setEnd(int end_x,int end_y);
 private:
     int path_len=0;
+    std::vector<Point *> path_;
    // std::vector<std::vector<int>> costmap_;
 
 };

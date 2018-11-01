@@ -1,5 +1,5 @@
 #include "planner.h"
-#include "astar.h"
+
 #include<iostream>
 #include<math.h>
 //extern std::vector<std::vector<int>> costmap_(80, std::vector<int>(80, 0));//定义一个接收地图的函数
@@ -29,8 +29,8 @@ void Astar::setEnd(int end_x,int end_y)
     end.x=end_x;
     end.y=end_y;
     resetMapEnd();
-    costmap_[end_x][end_y]=4;
-    emit onDrawPose(end_x,end_y,4);
+    costmap_[end_x][end_y]=2;
+    emit onDrawPose(end_x,end_y,2);
 }
 void Astar::calculate()//相当于main函数
 {
@@ -39,10 +39,11 @@ void Astar::calculate()//相当于main函数
     std::list<Point *>path_=astar_1.getPath(start, end);
     if(path_.empty())
     {
-      //  std::cout<<"path is empty"<<std::endl;
+        std::cout<<"path is empty"<<std::endl;
         emit showState(0);
         resetMap();
     }
+    std::cout<<"success"<<path_.size()<<std::endl;
     path_len=path_.size();
     emit showPath(path_len);//发送路径长度
     Point *last=path_.front();//记录上一个点
@@ -99,5 +100,14 @@ int Astar::getPathLen()
 {
     return path_len;
 }
-
+std::vector<Point *> Astar::returnPath()
+{
+    std::vector<Point *> path;
+    for(auto &iter : path_)
+    {
+        Point
+    }
+    std::cout<<"return path"<<path.size()<<std::endl;
+    return path;
+}
 

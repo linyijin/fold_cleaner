@@ -14,6 +14,9 @@ Status{
     bump,//直线碰撞
     turn_bump,//转弯碰撞
     turn_finish,
+    follow_finish,
+    overclean,
+    overclean_move,//直线运动中发送重复清扫
     finish,
     failed,
     navigation
@@ -37,12 +40,13 @@ public:
     //std::vector<Point *> nb8( Point* cur);
 
     //分解的fold函数
+    bool overClean();//判断是否重复清扫，重复清扫则要重新找点
     state fold_run();//用于判断当前状态选择执行函数
     void fold_move();
     void fold_turn();
     void fold_turnBack();//完成转弯
     state fold_follow();//沿墙:绕过障碍物 重复清扫进入导航，返回
-    state fold_nav();
+    state fold_nav(Point *target);
 
     //碰撞处理函数
     void bumpHandle(const int bump_type);//处理碰撞
@@ -50,6 +54,7 @@ public:
 signals:
     void velUpdate(const int vl,const int va);//通知主窗口更新
     void onDrawPose(int x,int y,int type);//通知画点
+    void onDrawPath(int x1,int y1,int x2,int y2,int type);
     void showState(int type);
 private slots:
     void posUpdate();//计数刷新
@@ -62,6 +67,9 @@ private:
     Point *curPos=new Point;
     Point *lastPos=new Point;
     int bump_type;//碰撞类型
+    bool inFollow=false;//follow模式判断
+    bool pathOver=false;//规划完毕
+    int direction;
 };
 
 

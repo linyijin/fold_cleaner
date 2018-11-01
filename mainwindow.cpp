@@ -19,7 +19,7 @@ MainWindow::MainWindow(QMainWindow*parent) :
     ui(new Ui::MainWindow)
 {
     timer=new QTimer(this);
-    timer->start(50);
+    timer->start(10);
     timer2=new QTimer(this);
    // setWindowTitle(tr("路径规划演示"));
     ui->setupUi(this);
@@ -43,6 +43,7 @@ MainWindow::MainWindow(QMainWindow*parent) :
     //connect(move,SIGNAL(velUpdate(int,int)),this,SLOT(VelUpdate(int,int)));//绑定运动对象更新事件
     connect(timer,SIGNAL(timeout()),move,SLOT(posUpdate()));//计数结束通知Move更新
     connect(move,SIGNAL(onDrawPose(int,int,int)),this,SLOT(onDrawPose(int,int,int)));//绑定move的绘制事件
+     connect(move,SIGNAL(onDrawPath(int,int,int,int,int)),this,SLOT(onDrawPath(int,int,int,int,int)));
 
     connect(timer2,SIGNAL(timeout()),move,SLOT(fold()));
 
@@ -325,6 +326,21 @@ void MainWindow::showState(int type)
         break;
     case 2:
         ui->state->setPlainText("bumps");
+        break;
+    case 3:
+        ui->state->setPlainText("turn");
+        break;
+    case 4:
+        ui->state->setPlainText("follow wall");
+        break;
+    case 5:
+         ui->state->setPlainText("over clean");
+        break;
+    case 6:
+         ui->state->setPlainText("move over clean");
+        break;
+    case 7:
+         ui->state->setPlainText("path is over");
         break;
     default:
         ui->state->setPlainText(("ok"));

@@ -1,18 +1,13 @@
 #ifndef ASTAR_H
 #define ASTAR_H
+#include "pose2d.h"
 #include<iostream>
 #include<vector>
 #include<list>
 
 const int lcost = 10;
 const int tcost = 14;
-struct Point {
-    int x;
-    int y;
-    int F, G, H;
-    Point *parent;
-    Point (int _x, int _y) : x(_x), y(_y), F(0), G(0), H(0), parent(NULL) {}//初始化
-};
+
 class Astar_1{//定义算法用的对象
 public:
     int sum = 0;//记录总里程
