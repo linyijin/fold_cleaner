@@ -14,13 +14,13 @@ Searcher::~Searcher()
 bool Searcher::isTarget( Point *Target)
 {
     std::vector<Point *> nbr8=nb8(Target);
-    int obstacle=0;
+    int freeSize=0;
     for(auto &iter : nbr8)
     {
-        if(costmap_[iter->x][iter->y]==8)
-            obstacle++;
+        if(costmap_[iter->x][iter->y]!=8)
+            freeSize++;
     }
-    if(obstacle==0)
+    if(freeSize==9)
         return true;
     else
         return false;
@@ -40,7 +40,7 @@ std::vector<Point *> Searcher::SearcherFrom(Point *cur)
     cur->visited=1;
     bfs.push_back(cur);
     Point *current;
-    while(!bfs.empty())
+    while(!bfs.empty()&& potentialTarget.empty())//有目标点不再搜索
     {
         std::cout<<bfs.size()<<std::endl;
         current=bfs.front();
@@ -60,5 +60,4 @@ std::vector<Point *> Searcher::SearcherFrom(Point *cur)
 
     }
    return potentialTarget;//返回队列
-
 }

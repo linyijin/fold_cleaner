@@ -13,13 +13,13 @@ Astar::Astar(std::vector<std::vector<int>> &costmap)//将主窗口地图送来,�
     costmap_=costmap;
 }
 Astar::~Astar(){
-
+std::cout<<"destroy astar"<<std::endl;
 }
 void Astar::setStart(int start_x, int start_y)
 {
     start.x=start_x;
     start.y=start_y;
-    resetMap();
+    //resetMap();
     costmap_[start_x][start_y]=2;
     emit onDrawPose(start_x,start_y,2);//绘制起始点
 
@@ -28,7 +28,7 @@ void Astar::setEnd(int end_x,int end_y)
 {
     end.x=end_x;
     end.y=end_y;
-    resetMapEnd();
+    //resetMapEnd();
     costmap_[end_x][end_y]=2;
     emit onDrawPose(end_x,end_y,2);
 }
@@ -43,8 +43,12 @@ void Astar::calculate()//相当于main函数
         emit showState(0);
         resetMap();
     }
-    std::cout<<"success"<<path_.size()<<std::endl;
+    //std::cout<<"success"<<path_.size()<<std::endl;
     path_len=path_.size();
+    for(auto &iter : path_)//把点直接放入数组
+    {
+        path.push_back(iter);
+    }
     emit showPath(path_len);//发送路径长度
     Point *last=path_.front();//记录上一个点
     for (auto &p : path_)
@@ -74,7 +78,7 @@ void Astar::resetMap()
         {
             if(i==0 || j==0||i==79 ||j==79)
                 costmap_[i][j]=8;
-            else if(costmap_[i][j]==4)
+            else if(costmap_[i][j]==4 ||costmap_[i][j]==8)
                 continue;
             else
                 costmap_[i][j]=0;
@@ -100,14 +104,10 @@ int Astar::getPathLen()
 {
     return path_len;
 }
-std::vector<Point *> Astar::returnPath()
+std::list<Point *> Astar::returnPath()
 {
-    std::vector<Point *> path;
-    for(auto &iter : path_)
-    {
-        Point
-    }
-    std::cout<<"return path"<<path.size()<<std::endl;
+    //std::cout<<path.size()<<std::endl;
     return path;
 }
+
 

@@ -4,10 +4,14 @@
 #include<vector>
 #include<cmath>
 #include<iostream>
+using std::cout;
+using std::endl;
+
 struct Point{
     int x;
     int y;
     int theta;
+
     bool visited;//用于bfs搜索目标点时减少不必要的搜索
     int F, G, H;
     Point *parent;

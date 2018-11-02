@@ -15,8 +15,8 @@ public:
     std::vector<Point *>SearcherFrom(Point *cur);
     bool isTarget(Point *Target);//目标点周围必须有至少3个直线点的空间
     std::vector<Point *> buildLine(const Point *Target);//目标点设定方向上无障碍物阻挡点均不再搜索
-    int judgeHeading(const Point *Target);//根据左右未清扫点决定方向
-    int judgeDirection(const Point *Target);//根据上下无信息点决定弓字方向
+   // int judgeHeading(const Point *Target);//根据左右未清扫点决定方向
+  //  int judgeDirection(const Point *Target);//根据上下无信息点决定弓字方向
     void clearSearch();//路径规划结束，销毁本次搜索的点，下次要搜索
     bool isInQueue(Point *p,std::list<Point *> q);
 

@@ -3,7 +3,7 @@
 #include<QTGui>
 #include<iostream>
 #include<vector>
-
+#include<list>
 #include "pose2d.h"
 #define celldistance 0.2
 //extern std::vector<std::vector<int>>
@@ -17,6 +17,8 @@ Status{
     follow_finish,
     overclean,
     overclean_move,//直线运动中发送重复清扫
+    nav_finish,
+    controlling,
     finish,
     failed,
     navigation
@@ -47,9 +49,12 @@ public:
     void fold_turnBack();//完成转弯
     state fold_follow();//沿墙:绕过障碍物 重复清扫进入导航，返回
     state fold_nav(Point *target);
+    state nav_control();
 
     //碰撞处理函数
     void bumpHandle(const int bump_type);//处理碰撞
+    int judgeHeading();//根据左右未清扫点决定方向
+    int judgeDirection();//根据上下无信息点决定弓字方向
 
 signals:
     void velUpdate(const int vl,const int va);//通知主窗口更新
@@ -69,7 +74,9 @@ private:
     int bump_type;//碰撞类型
     bool inFollow=false;//follow模式判断
     bool pathOver=false;//规划完毕
+    bool navControl=false;//规划路径控制
     int direction;
+    std::list<Point *> path;
 };
 
 

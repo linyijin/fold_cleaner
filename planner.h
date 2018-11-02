@@ -18,7 +18,7 @@ public:
     Astar(std::vector<std::vector<int>> &costmap);
     ~Astar();
     int getPathLen();
-    std::vector<Point *> returnPath();
+    std::list<Point *> returnPath();
 signals:
     void onDrawPose(int x,int y,int type);
     void onDrawPath(int x1,int y1,int x2,int y2,int type);
@@ -28,13 +28,14 @@ signals:
 public slots:
     void calculate();
     void resetMap();
+    //void resetMapStart();
     void resetMapEnd();
     void  obstacleset(int x,int y);
     void setStart(int start_x,int start_y);
     void setEnd(int end_x,int end_y);
 private:
     int path_len=0;
-    std::vector<Point *> path_;
+    std::list<Point *> path;
    // std::vector<std::vector<int>> costmap_;
 
 };
