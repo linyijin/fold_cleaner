@@ -48,9 +48,9 @@ Point *Move::getPose() const
 void Move::posUpdate()//根据curpos绘制机体,更新机体
 {
     //std::cout<<curPos.x<<' '<<curPos.y<<std::endl;
-    cout<<"cur"<<curPos->x<<' '<<curPos->y<<endl;
-    cout<<"last"<<lastPos->x<<' '<<lastPos->y<<endl;
-    cout<<"theta"<<curPos->theta<<endl;
+  //  cout<<"cur"<<curPos->x<<' '<<curPos->y<<endl;
+  //  cout<<"last"<<lastPos->x<<' '<<lastPos->y<<endl;
+   // cout<<"theta"<<curPos->theta<<endl;
     std::vector<Point *> lastBody=nb8(lastPos);//建立上一个body
     for(auto &iter :lastBody)
     {
@@ -293,9 +293,9 @@ state Move::nav_control()
           path.pop_front();
           next=path.front();
           curPos->theta=(next->y-curPos->y)+(next->x-curPos->x-1)*3+8-1;//delta_y+(delta_x-1)*3+8
-          cout<<"curpos"<<curPos->x<<' '<<curPos->y<<endl;
-          cout<<"next"<<next->x<<' '<<next->y<<endl;
-          cout<<curPos->theta<<endl;
+      //    cout<<"curpos"<<curPos->x<<' '<<curPos->y<<endl;
+       //   cout<<"next"<<next->x<<' '<<next->y<<endl;
+        //  cout<<curPos->theta<<endl;
           return controlling;
     }
     lastPos->x=curPos->x;
@@ -437,8 +437,8 @@ void Move::fold()
         state state_=nav_control();
         if(state_==finish)
         {
-            cout<<"nav is over"<<endl;
-            cout<<curPos->x<<' '<<curPos->y<<endl;
+          //  cout<<"nav is over"<<endl;
+//            cout<<curPos->x<<' '<<curPos->y<<endl;
             navControl=false;
             judgeDirection();
 
@@ -449,7 +449,7 @@ void Move::fold()
     }
     case finish:
     {
-        cout<<"ready to move"<<endl;
+       // cout<<"ready to move"<<endl;
 
     }
      default:
