@@ -143,7 +143,7 @@ state Move::fold_run()
         }
         else
         {
-          /*  int move_no_imformation=0;
+            int move_no_imformation=0;
             for(int i=1;i<4;i++)//在转弯之后判断直线运动中是否重复清扫，防止越界
             {
                 for(int j=-1;j<2;j++)
@@ -153,7 +153,7 @@ state Move::fold_run()
                 }
             }
             if(move_no_imformation==0)
-                return overclean_move;*/
+                return overclean;
              return running;
         }
 

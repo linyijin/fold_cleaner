@@ -50,7 +50,7 @@ MainWindow::MainWindow(QMainWindow*parent) :
 
 
     //绘制网格地图
-    m_sceneSize =QSize(581,581);
+    m_sceneSize =QSize(580,580);
     m_cellSize=m_sceneSize/80;
     QGraphicsScene *scene=new QGraphicsScene();
     scene->setSceneRect(0,0,m_sceneSize.width(),m_sceneSize.height());
@@ -202,12 +202,21 @@ void MainWindow::drawGridMap()//绘制空白地图
 void MainWindow::mousePressEvent(QMouseEvent *e)
 {
     QString str="("+QString::number(e->x())+","+QString::number(e->y())+")";
-    std::cout<<e->x()<<' '<<e->y()<<endl;
-    if(e->x()>225 && e->x()<(79*m_cellSize.width()+225) && e->y()>10 && e->y()<581)//障碍设置条件
+    //std::cout<<e->x()<<' '<<e->y()<<endl;
+    if(e->x()>225 && e->x()<(79*m_cellSize.width()+220) && e->y()>10 && e->y()<581)//障碍设置条件
     {
        // std::cout<<"mouse"<<e->x()<<' '<<e->y()<<std::endl;
-        int x=(e->x()-225)/m_cellSize.width()+1;//修正点击坐标200
-        int y=(e->y()-8)/m_cellSize.height()-1;//10
+        int x=(e->x()-220)/m_cellSize.width()+1;//修正点击坐标200
+        int y=(e->y()-20)/m_cellSize.height()-1;//10
+       // cout<<"map="<<x<<' '<<y<<endl;
+        if(x>=79)
+        {
+            x=78;
+        }
+        if(y>=79)
+        {
+            y=78;
+        }
         if(setStart || setEnd)
         {
             if(setStart)
