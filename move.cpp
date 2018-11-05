@@ -47,10 +47,6 @@ Point *Move::getPose() const
 }
 void Move::posUpdate()//根据curpos绘制机体,更新机体
 {
-    //std::cout<<curPos.x<<' '<<curPos.y<<std::endl;
-  //  cout<<"cur"<<curPos->x<<' '<<curPos->y<<endl;
-  //  cout<<"last"<<lastPos->x<<' '<<lastPos->y<<endl;
-   // cout<<"theta"<<curPos->theta<<endl;
     std::vector<Point *> lastBody=nb8(lastPos);//建立上一个body
     for(auto &iter :lastBody)
     {
@@ -78,11 +74,6 @@ void Move::posUpdate()//根据curpos绘制机体,更新机体
                 emit onDrawPose(iter->x,iter->y,1);//机体其他部分绘制为蓝色
             }
         }
-    //lastPos->x=curPos->x;
-    //lastPos->y=curPos->y;
-    //lastPos->theta=curPos->theta;
-    //curPos->x++;
-    //delete test;
 }
 void Move::setCurPos(const int x, const int y)
 {
@@ -100,7 +91,6 @@ bool Move::overClean()
         if(costmap_[iter->x][iter->y]==0)
             no_imformation++;
     }
-    //std::cout<<no_imformation<<std::endl;
     if(no_imformation>=1)
         return false;
     else
@@ -211,7 +201,7 @@ void Move::fold_move()
      lastPos->y=curPos->y;
      lastPos->theta=curPos->theta;
      curPos->x=curPos->x+delta_x*1;
-     //body=nb8(curPos);//生成新的机体
+
 }
 void Move::fold_turn()//转弯
 {
@@ -224,7 +214,7 @@ void Move::fold_turn()//转弯
         lastPos->x=lastPos->x;
         curPos->theta=direction?Direction::buttom:Direction::top;
         curPos->y=curPos->y;//完成第一步前进
-        //body=nb8(curPos);
+
 
     }
     else if(delta_x<0)
@@ -248,17 +238,17 @@ void Move::fold_turnBack()//完成转弯
         lastPos->y=curPos->y;
         curPos->theta=Direction::left;
         curPos->y=curPos->y+(direction?1:-1);
-        //body=nb8(curPos);
+
     }
     else if(lastPos->theta==Direction::left)
     {
-        //lastTheta=curPos->theta;
+
         lastPos->theta=curPos->theta;
         lastPos->x=curPos->x;
         lastPos->y=curPos->y;
         curPos->theta=Direction::right;
         curPos->y=curPos->y+(direction?1:-1);
-       // body=nb8(curPos);
+
     }
 }
 state Move::fold_follow()
@@ -293,9 +283,6 @@ state Move::nav_control()
           path.pop_front();
           next=path.front();
           curPos->theta=(next->y-curPos->y)+(next->x-curPos->x-1)*3+8-1;//delta_y+(delta_x-1)*3+8
-      //    cout<<"curpos"<<curPos->x<<' '<<curPos->y<<endl;
-       //   cout<<"next"<<next->x<<' '<<next->y<<endl;
-        //  cout<<curPos->theta<<endl;
           return controlling;
     }
     lastPos->x=curPos->x;
@@ -449,10 +436,14 @@ void Move::fold()
     }
     case finish:
     {
-       // cout<<"ready to move"<<endl;
-
-    }
-     default:
+        cout<<"ready to move"<<endl;
         break;
     }
+    default:
+    {
+        break;
+    }
+    }
+    return;
+
 }

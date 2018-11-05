@@ -202,7 +202,8 @@ void MainWindow::drawGridMap()//绘制空白地图
 void MainWindow::mousePressEvent(QMouseEvent *e)
 {
     QString str="("+QString::number(e->x())+","+QString::number(e->y())+")";
-    if(e->x()>225 && e->x()<871 && e->y()>10 && e->y()<581)//障碍设置条件
+    std::cout<<e->x()<<' '<<e->y()<<endl;
+    if(e->x()>225 && e->x()<(79*m_cellSize.width()+225) && e->y()>10 && e->y()<581)//障碍设置条件
     {
        // std::cout<<"mouse"<<e->x()<<' '<<e->y()<<std::endl;
         int x=(e->x()-225)/m_cellSize.width()+1;//修正点击坐标200
@@ -350,9 +351,6 @@ void MainWindow::showState(int type)
 //时钟更新
 void MainWindow::VelUpdate(const int vl, const int va)
 {
-    //std::cout<<"set timer"<<std::endl;
-    timer->start(0.2/vl*100000);//设置计时扩大到秒级
-
 }
 
 void MainWindow::on_foldstart_clicked()

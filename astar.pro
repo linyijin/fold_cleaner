@@ -37,7 +37,8 @@ HEADERS += \
     planner.h \
     move.h \
     search.h \
-    pose2d.h
+    pose2d.h \
+    error.h
 
 FORMS += \
         mainwindow.ui
