@@ -30,4 +30,6 @@ bool insideMap(const Point *p);//判断是否未超出地图
 std::vector<Point *> nb8( Point* cur);
 std::vector<Point *> nb4(Point* cur);//四近邻
 std::vector<Point *> nb24(Point* cur);//创建24近邻数组，出界不考虑
+
+
 #endif // POSE2D_H

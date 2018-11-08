@@ -29,7 +29,12 @@ SOURCES += \
     astar.cpp \
     move.cpp \
     search.cpp \
-    pose2d.cpp
+    pose2d.cpp \
+    state.cpp \
+    hsm.cpp \
+    state_init.cpp \
+    state_move.cpp \
+    schedule_fold.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -37,7 +42,12 @@ HEADERS += \
     planner.h \
     move.h \
     search.h \
-    pose2d.h
+    pose2d.h \
+    state.h \
+    hsm.h \
+    state_init.h \
+    state_move.h \
+    schedule_fold.h
 
 FORMS += \
         mainwindow.ui

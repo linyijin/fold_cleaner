@@ -41,7 +41,7 @@ void Astar::calculate()//相当于main函数
     {
         std::cout<<"path is empty"<<std::endl;
         emit showState(0);
-        resetMap();
+      //  resetMap();
     }
     //std::cout<<"success"<<path_.size()<<std::endl;
     path_len=path_.size();
@@ -73,16 +73,16 @@ void Astar::obstacleset(int x, int y)
 }
 void Astar::resetMap()
 {
+   // cout<<"reset map"<<endl;
     for(int i=0;i<80;i++){
         for(int j=0;j<80;j++)
         {
             if(i==0 || j==0||i==79 ||j==79)
                 costmap_[i][j]=8;
-            else if(costmap_[i][j]==4 ||costmap_[i][j]==8)
-                continue;
             else
                 costmap_[i][j]=0;
              emit onDrawPose(i,j,costmap_[i][j]);//给mainwidow绘制
+
         }
     }
     emit showPath(0);

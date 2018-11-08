@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #include "planner.h"
 #include "move.h"
+#include "pose2d.h"
 
 #include<cstdlib>
 #include<QtGui>//mousetrack
@@ -12,6 +13,7 @@
 #include<QTWidgets/QVBoxLayout>
 
 std::vector<std::vector<int>> costmap_(80, std::vector<int>(80, 0));
+
 using std::cout;
 MainWindow::MainWindow(QMainWindow*parent) :
     QMainWindow(parent),
@@ -44,6 +46,7 @@ MainWindow::MainWindow(QMainWindow*parent) :
     connect(timer,SIGNAL(timeout()),move,SLOT(posUpdate()));//计数结束通知Move更新
     connect(move,SIGNAL(onDrawPose(int,int,int)),this,SLOT(onDrawPose(int,int,int)));//绑定move的绘制事件
      connect(move,SIGNAL(onDrawPath(int,int,int,int,int)),this,SLOT(onDrawPath(int,int,int,int,int)));
+     connect(move,SIGNAL(stop()),this,SLOT(stop()));
 
     connect(timer2,SIGNAL(timeout()),move,SLOT(fold()));
 
@@ -262,6 +265,8 @@ void MainWindow::mousePressEvent(QMouseEvent *e)
 void MainWindow::on_pushButton_2_clicked()
 {
     ui->pushButton->setDisabled(false);
+    ui->map->scene()->clear();//全部清除
+    drawGridMap();
 }
 
 void MainWindow::on_start_set_button_clicked()//设置起点
@@ -352,6 +357,9 @@ void MainWindow::showState(int type)
     case 7:
          ui->state->setPlainText("path is over");
         break;
+    case 8:
+         ui->state->setPlainText("clean is finish");
+        break;
     default:
         ui->state->setPlainText(("ok"));
         break;
@@ -365,4 +373,29 @@ void MainWindow::VelUpdate(const int vl, const int va)
 void MainWindow::on_foldstart_clicked()
 {
     timer2->start(100);
+}
+
+void MainWindow::on_stop_clicked()
+{
+    if(firstStop)
+    {
+         ui->stop->setText("继续运行");
+         stop();
+         firstStop=false;
+    }
+    else
+    {
+        ui->stop->setText("暂停");
+        reStart();
+        firstStop=true;
+    }
+
+}
+void MainWindow::stop()
+{
+       timer2->stop();
+}
+void MainWindow::reStart()
+{
+    timer2->start();
 }

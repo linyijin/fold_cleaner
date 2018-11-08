@@ -35,14 +35,20 @@ private slots:
     void showState(int type);//显示信息状态
 
     void VelUpdate(const int vl,const int va);//接收速度设置信号
+    void stop();//接收move发来的停止信号
+    void reStart();
 
   //  void posUpdate();
 
 
     void on_foldstart_clicked();
 
+
+    void on_stop_clicked();
+
 protected:
     void mousePressEvent(QMouseEvent *e);//添加按键检测事件，用于障碍物添加
+
 private:
     Ui::MainWindow *ui;
     Astar* astar;
@@ -53,6 +59,7 @@ private:
     bool refresh;//清空
     bool setStart=false;
     bool firstStart=true;
+    bool firstStop=true;
     bool setEnd=false;
     bool firstEnd=true;
     bool clickSet=false;

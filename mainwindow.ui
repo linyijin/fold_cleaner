@@ -241,11 +241,37 @@
       <x>10</x>
       <y>200</y>
       <width>75</width>
-      <height>31</height>
+      <height>51</height>
      </rect>
     </property>
     <property name="text">
      <string>弓字清扫</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_3">
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>200</y>
+      <width>51</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>暂停</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="stop">
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>230</y>
+      <width>51</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>停止</string>
     </property>
    </widget>
   </widget>

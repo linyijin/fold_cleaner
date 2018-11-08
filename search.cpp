@@ -42,7 +42,7 @@ std::vector<Point *> Searcher::SearcherFrom(Point *cur)
     Point *current;
     while(!bfs.empty()&& potentialTarget.empty())//有目标点不再搜索
     {
-        std::cout<<bfs.size()<<std::endl;
+       // std::cout<<bfs.size()<<std::endl;
         current=bfs.front();
         bfs.remove(current);
         close.push_back(current);//保存在close中
@@ -59,5 +59,7 @@ std::vector<Point *> Searcher::SearcherFrom(Point *cur)
         }
 
     }
+    if(potentialTarget.empty())
+        throw 1;
    return potentialTarget;//返回队列
 }

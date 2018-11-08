@@ -80,3 +80,4 @@ std::vector<Point *> nb24(Point* cur)
     }
     return nbr24;
 }
+
