@@ -21,12 +21,13 @@ MainWindow::MainWindow(QMainWindow*parent) :
     ui(new Ui::MainWindow)
 {
     timer=new QTimer(this);
-    timer->start(10);
+    //timer->start(10);
     timer2=new QTimer(this);
    // setWindowTitle(tr("路径规划演示"));
     ui->setupUi(this);
     astar=new Astar();
-    move=new Move();//设置一个新的运动对象,包括地图
+    move=new Move_state();//设置一个新的运动对象,包括地图
+  //  fold_schedule=new FoldSchedule();
 
     //设置当前位置
    // move->setCurPos(40,40);
@@ -373,6 +374,7 @@ void MainWindow::VelUpdate(const int vl, const int va)
 void MainWindow::on_foldstart_clicked()
 {
     timer2->start(100);
+    timer->start(100);
 }
 
 void MainWindow::on_stop_clicked()
@@ -394,8 +396,10 @@ void MainWindow::on_stop_clicked()
 void MainWindow::stop()
 {
        timer2->stop();
+       timer->stop();
 }
 void MainWindow::reStart()
 {
     timer2->start();
+    timer->stop();
 }

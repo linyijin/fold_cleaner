@@ -1,6 +1,6 @@
 #include "state.h"
 #include "hsm.h"
-QState::QState():
+State::State():
     hsm_(0),
     handler_(0),
     name_(0),
@@ -8,15 +8,15 @@ QState::QState():
     parent_(0)
 {
 }
-QState::QState(QHsm *hsm,QFun fun):
+State::State(QHsm *hsm,QFun fun):
     hsm_(hsm),
     handler_(fun),
     name_(".Root"),
     level_(0),
-    parent_((QState *)0)
+    parent_((State *)0)
 {
 }
-QState::QState(QHsm *hsm,const char *name,QState *parent):
+State::State(QHsm *hsm,const char *name,State *parent):
     hsm_(hsm),
     name_(name),
     parent_(parent)
@@ -28,12 +28,12 @@ QState::QState(QHsm *hsm,const char *name,QState *parent):
     level_=parent->level_+1;
 
 }
-QState::QState(const QState &state)
+State::State(const State &state)
 {
     hsm_=state.hsm_;
     handler_=state.handler_;
     parent_=state.parent_;
     level_=state.level_;
 }
-void QState::initialize()
+void State::initialize()
 {}

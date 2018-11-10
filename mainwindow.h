@@ -5,6 +5,7 @@
 #include<QLabel>
 #include "planner.h"
 #include "move.h"
+
 #include<qtimer.h>
 namespace Ui {
 class MainWindow;
@@ -52,7 +53,8 @@ protected:
 private:
     Ui::MainWindow *ui;
     Astar* astar;
-    Move *move;
+    Move_state *move;
+  //  FoldSchedule *fold_schedule;
     QSize m_sceneSize;
     QSize m_cellSize;
     QLabel *MousePosLabel;//添加显示鼠标点击坐标
@@ -65,6 +67,7 @@ private:
     bool clickSet=false;
     QTimer *timer;//定义一个更新时钟
     QTimer *timer2;//定义第二个时钟用来刷新运动
+
 
 };
 

@@ -5,23 +5,23 @@ class QHsm
 {
 public:
     QHsm();
-    QHsm(const char *name,QState *init_state=0);
+    QHsm(const char *name,State *init_state=0);
     virtual ~QHsm(){}
-    virtual void setInitState(QState *state);
-    virtual int isInState(const QState *state);
-    virtual QState *GetState();//获取当前状态
-    virtual void Run(QEvent event,StateArgs *param);//发布信号
-    virtual void Tran(QState *next_state,StateArgs *param,void(*method)(QHsm *This,StateArgs *param));
+    virtual void setInitState(State *state);
+    virtual int isInState(const State *state);
+    virtual State *GetState();//获取当前状态
+    virtual void Run(Event event,StateArgs *param);//发布信号
+    virtual void Tran(State *next_state,StateArgs *param,void (*method)(QHsm *This, StateArgs *param));
 
-    QEvent *func(QEvent event,StateArgs *param){return 0;}
+    Event *func(Event event,StateArgs *param){return 0;}
 
     virtual void run(){}
     virtual void tran(){}
 
-    QState root_;
+    State root_;
     int terminate_;
 protected:
-    QState *cur_state;
+    State *cur_state;
     bool hsm_tran_;
     const char* name_;
 };

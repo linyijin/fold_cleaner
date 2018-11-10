@@ -34,7 +34,9 @@ SOURCES += \
     hsm.cpp \
     state_init.cpp \
     state_move.cpp \
-    schedule_fold.cpp
+    schedule_fold.cpp \
+    state_turn.cpp \
+    state_followy.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -47,7 +49,9 @@ HEADERS += \
     hsm.h \
     state_init.h \
     state_move.h \
-    schedule_fold.h
+    schedule_fold.h \
+    state_turn.h \
+    state_followy.h
 
 FORMS += \
         mainwindow.ui

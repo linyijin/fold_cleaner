@@ -3,12 +3,15 @@
 
 #include "search.h"
 #include<QtGui>
-
+Point *curPos=new Point;
+Point *lastPos=new Point;
+std::vector<Point *> body;//机体信息
+FoldSchedule *fold_schedule=new FoldSchedule();
 extern  std::vector<std::vector<int>> costmap_;
-Move::Move()
+Move_state::Move_state()
 {
     curPos->x=40;
-    curPos->y=4;
+    curPos->y=40;
     startPos->x=curPos->x;
     startPos->y=curPos->y;
    // stallPos->x=startPos->x;
@@ -18,8 +21,9 @@ Move::Move()
     lastPos->x=curPos->x;
     lastPos->y=curPos->y;
     direction=0;
+    fold_schedule->init();
 }
-Move::Move(const int vl,const int va)
+Move_state::Move_state(const int vl,const int va)
 {
     linear_v=vl;
     angular_v=va;
@@ -33,7 +37,7 @@ Move::Move(const int vl,const int va)
     lastPos->theta=curPos->theta;
     direction=0;
 }
-Move::Move(std::vector<std::vector<int>> &map)
+Move_state::Move_state(std::vector<std::vector<int>> &map)
 {
     curPos->x=40;
     curPos->y=40;
@@ -45,12 +49,29 @@ Move::Move(std::vector<std::vector<int>> &map)
     direction=0;
     //map_=map;
 }
-Point *Move::getPose() const
+Point *Move_state::getPose() const
 {
     return curPos;
 }
-void Move::posUpdate()//根据curpos绘制机体,更新机体
+void Move_state::posUpdate()//根据curpos绘制机体,更新机体
 {
+    std::vector<Point *> nb_8=nb8(body[curPos->theta]);
+    bool pass=true;
+    for(auto &iter : nb_8)
+    {
+        if(costmap_[iter->x][iter->y]==8)
+            pass=false;
+    }
+    if(nb_8.size()==9 && pass)
+    {
+        //cout<<"move by search"<<endl;
+        lastPos->x=curPos->x;
+        lastPos->y=curPos->y;
+        curPos->x=body[curPos->theta]->x;
+        curPos->y=body[curPos->theta]->y;
+    }
+    else
+        emit stop();
     std::vector<Point *> lastBody=nb8(lastPos);//建立上一个body
     for(auto &iter :lastBody)
     {
@@ -79,13 +100,18 @@ void Move::posUpdate()//根据curpos绘制机体,更新机体
             }
         }
 }
-void Move::setCurPos(const int x, const int y)
+void Move_state::setCurPos(const int x, const int y)
 {
     curPos->x=x;
     curPos->y=y;
     startPos->x=x;
     startPos->y=y;
 }
+void Move_state::fold()
+{
+    fold_schedule->run();
+}
+/*
 std::vector<Point *> Move::angle(Point* cur,int direc,int head)//以0位置的左边三角为基准三角:上：head=1,左：direc=1
 {
    // cout<<"start to create an angle"<<endl;
@@ -802,3 +828,4 @@ void Move::fold()
     return;
 
 }
+*/

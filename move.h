@@ -5,9 +5,10 @@
 #include<vector>
 #include<list>
 #include "pose2d.h"
+#include "schedule_fold.h"
 #define celldistance 0.2
 //extern std::vector<std::vector<int>>
-
+/*
 typedef enum
 Status{
     running=1,
@@ -27,8 +28,8 @@ Status{
     lostWall,
 
     navigation
-}state;
-class Move:public QObject
+}state;*/
+class Move_state:public QObject
 {
     Q_OBJECT
 public:
@@ -38,9 +39,9 @@ public:
         top_right,right,buttom_right
     };
 
-    Move(std::vector<std::vector<int>> &map);//传入地图初始化
-    Move(const int vl,const int va);
-    Move();
+    Move_state(std::vector<std::vector<int>> &map);//传入地图初始化
+    Move_state(const int vl,const int va);
+    Move_state();
     Point *getPose() const;
     void setVel(const int vl,const int va);//速度设置
     void setCurPos(const int x,const int y);//设置当前位置
@@ -49,7 +50,7 @@ public:
 
     //分解的fold函数
     bool overClean();//判断是否重复清扫，重复清扫则要重新找点
-    state fold_run();//用于判断当前状态选择执行函数
+    /*state fold_run();//用于判断当前状态选择执行函数
     void fold_move();
     void fold_turn();
     void fold_turnBack();//完成转弯
@@ -57,7 +58,7 @@ public:
     state fold_nav(Point *target);
     state nav_control();
     state fold_followWall();
-    state searchWall();
+    state searchWall();*/
 
     //碰撞处理函数
     void bumpHandle(const int bump_type);//处理碰撞
@@ -77,9 +78,8 @@ private slots:
 private:
     int linear_v;//线速度
     int angular_v;//角速度
-    std::vector<Point *> body;//机体信息
-    Point *curPos=new Point;
-    Point *lastPos=new Point;
+
+
     Point *startPos=new Point;
     Point *stallPos=new Point;
     int bump_type;//碰撞类型
@@ -92,6 +92,7 @@ private:
     int stallCount=0;
     int timeCount=0;
     std::list<Point *> path;
+
 };
 
 

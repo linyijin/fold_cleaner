@@ -6,7 +6,7 @@ QHsm::QHsm():
   hsm_tran_(0)
 {
 };
-QHsm::QHsm(const char *name,QState *init_state)
+QHsm::QHsm(const char *name,State *init_state)
     :name_(name),
       //root_(init_state),
       terminate_(0),
@@ -15,15 +15,16 @@ QHsm::QHsm(const char *name,QState *init_state)
 {
     cur_state=init_state;
 }
-void QHsm::setInitState(QState *state)
+void QHsm::setInitState(State *state)
 {
     if(state)
         cur_state=state;
     (this->*(cur_state->handler_))(Q_ENTRY_SIG,(StateArgs *)0);//执行当前状态的handler
+  //(this->*(cur_state->handler_))(Q_INIT_SIG,(StateArgs *)0);
 }
-int QHsm::isInState(const QState *state)
+int QHsm::isInState(const State *state)
 {
-    QState *temp;
+    State *temp;
     for(temp=cur_state;temp;temp=temp->parent_)
     {
         if(state==temp)
@@ -33,31 +34,34 @@ int QHsm::isInState(const QState *state)
     }
     return 0;
 }
-QState* QHsm::GetState()
+State* QHsm::GetState()
 {
     return cur_state;
 }
-void QHsm::Run(QEvent event, StateArgs *param)
+void QHsm::Run(Event event, StateArgs *param)
 {
-    QState *state=cur_state;
+    cout<<"statrt to run signal"<<endl;
+    State *state=cur_state;
     while(event)
     {
+        cout<<event<<endl;
         event=(this->*(state->handler_))(event,param);//状态的handler接收event处理并返回一个event
         state=state->parent_;//处理结果呈报给父节点继续处理
     }
+    cout<<"event is dealed"<<endl;
 }
-void QHsm::Tran(QState *next_state, StateArgs *param, void (*method)(QHsm *, StateArgs *))
+void QHsm::Tran(State *next_state, StateArgs *param,void (*method)(QHsm *This, StateArgs *param))
 {
     if(hsm_tran_)
         return;
     hsm_tran_=1;//置位转换标志
-    QState *list_exit[5];
-    QState *list_entry[5];
+    State *list_exit[5];
+    State *list_entry[5];
     int cnt_exit=0;
     int cnt_entry=0;
     int idx;
-    QState *src=cur_state;
-    QState *dst=next_state;
+    State *src=cur_state;
+    State *dst=next_state;
     while(src->level_!=dst->level_)
     {
         if(src->level_>dst->level_)
@@ -94,5 +98,5 @@ void QHsm::Tran(QState *next_state, StateArgs *param, void (*method)(QHsm *, Sta
     }
     cur_state=next_state;
     hsm_tran_=0;
-    (this->*(cur_state->handler_))(Q_INIT_SIG,param);
+    (this->*(cur_state->handler_))(Q_INIT_SIG,param);//执行当前状态的init
 }

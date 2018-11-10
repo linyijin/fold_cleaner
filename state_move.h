@@ -2,7 +2,7 @@
 #define STATE_MOVE_H
 #include "state.h"
 #include<vector>
-struct Move:QState
+struct Move:State
 {
 public:
     typedef enum
@@ -21,8 +21,8 @@ public:
     };
     Move();
     Move(const Move&rhs);
-    Move(QHsm &hsm,const char *name,QState *parent=0);
-    ~Move();
+    Move(QHsm *hsm,const char *name,State *parent=0);
+    ~Move(){}
 
     void onEnter(StateArgs *param);
     void onExit(StateArgs *param);
@@ -30,12 +30,12 @@ public:
 public:
     int direction_;
     int heading_;
+
     Forward state_;
     Point *startPos_;
     Point *curPos_;
     Point *lastPos_;
     std::vector<Point *> body;
-    extern Point *curPos;//全局记录变量
-    extern Point *lastPos;
-}
+
+};
 #endif // STATE_MOVE_H
