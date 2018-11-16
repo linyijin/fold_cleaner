@@ -74,6 +74,7 @@ signals:
 private slots:
     void posUpdate();//计数刷新
     void fold();
+    void fold_start();
 
 private:
     int linear_v;//线速度

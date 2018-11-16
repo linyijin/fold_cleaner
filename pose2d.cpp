@@ -1,10 +1,12 @@
 #include "pose2d.h"
+
 bool insideMap(const Point *p)
 {
     if ((p->x<1) || (p->y<1) || (p->x>79)|| (p->y>79))
         return false;
     return true;
 }
+
 std::vector<Point *> nb8( Point* cur)
 {
         std::vector<Point *> nbr8;

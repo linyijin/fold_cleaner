@@ -26,8 +26,6 @@ void Turn::onEnter(StateArgs *param)
 }
 void Turn::onExit(StallArgs *param)
 {
-    direction_=0;
-    heading_=1;
 }
 Status Turn::onInit(StateArgs *param)
 {

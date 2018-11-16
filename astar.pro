@@ -36,7 +36,10 @@ SOURCES += \
     state_move.cpp \
     schedule_fold.cpp \
     state_turn.cpp \
-    state_followy.cpp
+    state_followy.cpp \
+    controller.cpp \
+    state_nav.cpp \
+    state_followwall.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -51,7 +54,10 @@ HEADERS += \
     state_move.h \
     schedule_fold.h \
     state_turn.h \
-    state_followy.h
+    state_followy.h \
+    controller.h \
+    state_nav.h \
+    state_followwall.h
 
 FORMS += \
         mainwindow.ui

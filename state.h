@@ -22,7 +22,7 @@ _Status{
     overclean,
     stall,
     overclean_move,//直线运动中发送重复清扫
-    nav_finish,
+   // nav_finish,
     controlling,
     finish,
     failed,
@@ -30,7 +30,9 @@ _Status{
     follow_judge,
     lostWall,
     ready,
-    navigation
+    navigation,
+    clean_finish,
+    success
 }Status;
 struct StateArgs
 {

@@ -106,7 +106,6 @@ int Astar::getPathLen()
 }
 std::list<Point *> Astar::returnPath()
 {
-    //std::cout<<path.size()<<std::endl;
     return path;
 }
 

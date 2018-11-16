@@ -40,15 +40,13 @@ State* QHsm::GetState()
 }
 void QHsm::Run(Event event, StateArgs *param)
 {
-    cout<<"statrt to run signal"<<endl;
+
     State *state=cur_state;
     while(event)
     {
-        cout<<event<<endl;
         event=(this->*(state->handler_))(event,param);//状态的handler接收event处理并返回一个event
         state=state->parent_;//处理结果呈报给父节点继续处理
     }
-    cout<<"event is dealed"<<endl;
 }
 void QHsm::Tran(State *next_state, StateArgs *param,void (*method)(QHsm *This, StateArgs *param))
 {

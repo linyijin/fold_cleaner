@@ -13,7 +13,6 @@
 #include<QTWidgets/QVBoxLayout>
 
 std::vector<std::vector<int>> costmap_(80, std::vector<int>(80, 0));
-
 using std::cout;
 MainWindow::MainWindow(QMainWindow*parent) :
     QMainWindow(parent),
@@ -47,9 +46,11 @@ MainWindow::MainWindow(QMainWindow*parent) :
     connect(timer,SIGNAL(timeout()),move,SLOT(posUpdate()));//计数结束通知Move更新
     connect(move,SIGNAL(onDrawPose(int,int,int)),this,SLOT(onDrawPose(int,int,int)));//绑定move的绘制事件
      connect(move,SIGNAL(onDrawPath(int,int,int,int,int)),this,SLOT(onDrawPath(int,int,int,int,int)));
+    connect(this,SIGNAL(fold_start()),move,SLOT(fold_start()));
      connect(move,SIGNAL(stop()),this,SLOT(stop()));
 
     connect(timer2,SIGNAL(timeout()),move,SLOT(fold()));
+
 
 
 
@@ -60,18 +61,6 @@ MainWindow::MainWindow(QMainWindow*parent) :
     scene->setSceneRect(0,0,m_sceneSize.width(),m_sceneSize.height());
     ui->map->setScene(scene);
     drawGridMap();
-    //鼠标坐标显示标签
-/*
-    MousePosLabel=new QLabel;
-    MousePosLabel->setText(tr("obstacle point"));
-    QVBoxLayout *layoutV1=new QVBoxLayout();
-    layoutV1->addWidget(MousePosLabel);//子窗口显示
-    layoutV1->addStretch();
-    QHBoxLayout *mainlayout=new QHBoxLayout();
-    mainlayout->addStretch();
-    mainlayout->addLayout(layoutV1);
-    setLayout(mainlayout);
-*/
     //map追踪鼠标
     ui->map->setMouseTracking(true);
 
@@ -267,6 +256,7 @@ void MainWindow::on_pushButton_2_clicked()
 {
     ui->pushButton->setDisabled(false);
     ui->map->scene()->clear();//全部清除
+    ui->foldstart->setDisabled(false);
     drawGridMap();
 }
 
@@ -375,6 +365,8 @@ void MainWindow::on_foldstart_clicked()
 {
     timer2->start(100);
     timer->start(100);
+    fold_start();
+    ui->foldstart->setDisabled(true);
 }
 
 void MainWindow::on_stop_clicked()
@@ -401,5 +393,5 @@ void MainWindow::stop()
 void MainWindow::reStart()
 {
     timer2->start();
-    timer->stop();
+    timer->start();
 }

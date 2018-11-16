@@ -15,7 +15,7 @@ public:
 
     Event *func(Event event,StateArgs *param){return 0;}
 
-    virtual void run(){}
+    virtual Status run(){}
     virtual void tran(){}
 
     State root_;

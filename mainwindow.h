@@ -20,6 +20,7 @@ public:
     void drawGridMap();
 signals:
     void obstacleset(int x,int y);//设置障碍物显示信号
+    void fold_start();
 
 private slots:
     void on_pushButton_clicked();

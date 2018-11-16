@@ -95,8 +95,8 @@ Point *Astar_1::getLeastPoint(std::list<Point*> p)
 }
 Point * Astar_1::findPath(Point start_, Point end_)
 {
-   // cout<<start_.x<<' '<<start_.y<<endl;
-    //cout<<end_.x<<' '<<end_.y<<endl;
+   cout<<"findpath::start"<<start_.x<<','<<start_.y<<endl;
+   cout<<"findpath::end"<<end_.x<<','<<end_.y<<endl;
     openlist.push_back(new Point(start_.x, start_.y));//创建新的start点:参数是两个int数据，需要开辟point空间
     while (!openlist.empty())
     {

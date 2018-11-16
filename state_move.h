@@ -13,7 +13,7 @@ public:
     }Forward;
     struct Args:StateArgs
     {
-        Args(int direction=0,int heading=1):
+        Args(int direction,int heading):
         direction_(direction),heading_(heading)
         {}
         int direction_;
@@ -27,15 +27,11 @@ public:
     void onEnter(StateArgs *param);
     void onExit(StateArgs *param);
     Status onInit(StateArgs *param);//用来移动
+    bool overClean();
 public:
     int direction_;
     int heading_;
 
     Forward state_;
-    Point *startPos_;
-    Point *curPos_;
-    Point *lastPos_;
-    std::vector<Point *> body;
-
 };
 #endif // STATE_MOVE_H

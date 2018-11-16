@@ -7,8 +7,10 @@ Searcher::Searcher(Point *curPos_) :curPos(curPos_)//传递当前节点参数
 }
 Searcher::~Searcher()
 {
+    cout<<"~searcher"<<endl;
     for(auto &iter : potentialTarget)//访问标记清空
         iter->visited=0;
+    potentialTarget.clear();
     //delete[] potentialTarget;//销毁队列
 }
 bool Searcher::isTarget( Point *Target)

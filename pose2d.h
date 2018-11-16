@@ -7,6 +7,7 @@
 using std::cout;
 using std::endl;
 
+
 struct Point{
     int x;
     int y;
@@ -22,6 +23,12 @@ struct Point{
         if(x==s->x && y==s->y)
             return true;
         return false;
+    }
+    friend std::ostream &operator<<( std::ostream &os,const Point *point)
+    {
+
+            os<<point->x<<','<<point->y<<endl;
+            return os;
     }
    // Point();
     //Point(int x_,int y_):x(x_),y(y_),theta(0){}

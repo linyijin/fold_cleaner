@@ -1,8 +1,10 @@
 #include "schedule_fold.h"
+#include "controller.h"
 #include<vector>
 #include<iostream>
 using std::cout;
 using std::endl;
+int stall_count_;
 enum
 {
     Q_BUMP_SIG=Q_USER_SIG,
@@ -10,7 +12,8 @@ enum
     Q_WALL_SIG,
     Q_STALL_SIG,
     Q_OUT_BOUND_SIG,
-    Q_LOST_WALL_SIG
+    Q_LOST_WALL_SIG,
+    Q_FOLLOW_PATH_SIG
 };
 typedef enum
 {
@@ -18,7 +21,10 @@ typedef enum
     FOLD_STATE,
     MOVE_STATE,
     TURN_STATE,
-    FOLLOWY_STATE
+    FOLLOWY_STATE,
+    NAV_STATE,
+    FOLLOWWALL_STATE,
+    SEARCH_WALL_SATATE
 }StateType;
 static StateType current_state;
 static StateType last_state;
@@ -56,7 +62,6 @@ const char* HSM_Evt2Str(Event event)//信号转换为字符
 FoldSchedule::FoldSchedule():QHsm(),
     status_(ready),
     direction_(0),
-    stall_count_(0),
     heading_(1)
 {
     root_=State((QHsm *)this,(QFun)&FoldSchedule::func);
@@ -64,7 +69,12 @@ FoldSchedule::FoldSchedule():QHsm(),
     foldstate_=FoldState((QHsm *)this,"fold",(State *)0,(QFun)&FoldSchedule::foldFunc);
     movestate_=MoveState((QHsm *)this,"move",(State *)(&foldstate_),(QFun)&FoldSchedule::moveFunc);
     turnstate_=TurnState((QHsm *)this,"turn",(State *)(&foldstate_),(QFun)&FoldSchedule::turnFunc);
-    followystate_=FollowyState((QHsm *)this,"turn",(State *)(&foldstate_),(QFun)&FoldSchedule::followyFunc);
+    followystate_=FollowyState((QHsm *)this,"followy",(State *)(&foldstate_),(QFun)&FoldSchedule::followyFunc);
+    searchwallstate_=SearchWall((QHsm *)this,"searchwall",(State *)(&foldstate_),(QFun)&FoldSchedule::SearchwallFunc);
+    followwallstate_=Followwall((QHsm *)this,"followwall",(State *)(&searchwallstate_),(QFun)&FoldSchedule::followwallFunc);
+
+
+    navstate_=Navstate((QHsm *)this,"nav",(State *)0,(QFun)&FoldSchedule::navFunc);
 }
 void FoldSchedule::init()
 {
@@ -72,6 +82,7 @@ void FoldSchedule::init()
     direction_=0;
     stall_count_=0;
     heading_=1;
+    draw_path=false;
     setInitState(&foldstate_);
 }
 Event FoldSchedule::initFunc(Event event, StateArgs *param)
@@ -105,7 +116,7 @@ Event FoldSchedule::foldFunc(Event event, StateArgs *param)
         current_state=FOLD_STATE;
         if((void *)0==param)//无参数情况自己定义参数
         {
-          cout<<"parem==0?"<<endl;
+
             direction_=0;
             heading_=1;
         }
@@ -116,8 +127,6 @@ Event FoldSchedule::foldFunc(Event event, StateArgs *param)
             heading_=arg->heading_;
 
         }
-       // Move::Args args=Move::Args(foldstate_.direction_,foldstate_.heading_);
-       // Tran(&movestate_,&args,0);
         status_=ready;
         break;
     }
@@ -128,21 +137,22 @@ Event FoldSchedule::foldFunc(Event event, StateArgs *param)
         {
             Move::Args args=Move::Args(foldstate_.direction_,foldstate_.heading_);
             Tran(&movestate_,&args,0);
+
             break;
         }
         break;
     }
     case Q_BUMP_SIG:
     {
-        //BumpArgs *tmp_args=(BumpArgs*) param;
-        //bumpHandle(tmp_args);
-        if(foldstate_.heading_==1)
-            foldstate_.heading_=7;
-        else if(foldstate_.heading_==7)
-            foldstate_.heading_=1;
-        Turn::Args args=Turn::Args(foldstate_.direction_,foldstate_.heading_);
-        Tran(&turnstate_,&args,0);
-      return 0;
+        cout<<"fold::bump"<<endl;
+         return 0;
+        //break;
+    }
+    case Q_STALL_SIG:
+    {
+        cout<<"stall"<<endl;
+        Tran(&navstate_,nullptr,0);
+        return 0;
     }
     case Q_EXIT_SIG:
     {
@@ -156,11 +166,12 @@ Event FoldSchedule::foldFunc(Event event, StateArgs *param)
 }
 Event FoldSchedule::moveFunc(Event event, StateArgs *param)
 {
-    cout<<"move"<<endl;
+
     switch(event)
     {
     case Q_ENTRY_SIG:
     {
+        cout<<"move::enter"<<endl;
         current_state=MOVE_STATE;
         movestate_.onEnter(param);
         break;
@@ -169,22 +180,30 @@ Event FoldSchedule::moveFunc(Event event, StateArgs *param)
     {
         cout<<"move::init"<<endl;
         Status state=movestate_.onInit(param);
-        if(state==finish)
+        switch(state)
         {
-            //::Args args=Move::Args(foldstate_.direction_,foldstate_.heading_);
-            //Tran(&movestate_,args,0);
-            //break;
+        case overclean:
+        {
+            cout<<"move::over clean"<<endl;
+            Tran(&navstate_,nullptr,0);
+            return 0;
         }
-        break;
+        case finish:
+            return 0;
+        default:
+            break;
+        }
+        return 0;
     }
     case Q_BUMP_SIG:
     {
         if(foldstate_.heading_==1)
-            foldstate_.heading_==7;
+            foldstate_.heading_=7;
         else if(foldstate_.heading_==7)
             foldstate_.heading_=1;
         Turn::Args args=Turn::Args(foldstate_.direction_,foldstate_.heading_);
         Tran(&turnstate_,&args,0);
+        return 0;
         break;
     }
     case Q_EXIT_SIG:
@@ -197,12 +216,12 @@ Event FoldSchedule::moveFunc(Event event, StateArgs *param)
 }
 Event FoldSchedule::turnFunc(Event event, StateArgs *param)
 {
-    cout<<"turn"<<endl;
+
     switch(event)
     {
     case Q_ENTRY_SIG:
     {
-
+        cout<<"turn::enter"<<endl;
         current_state=TURN_STATE;
         turnstate_.onEnter(param);
         break;
@@ -210,11 +229,14 @@ Event FoldSchedule::turnFunc(Event event, StateArgs *param)
     case Q_INIT_SIG:
     {
         cout<<"turn::init"<<endl;
+        if(curPos->theta==1)
+            foldstate_.last_heading_=1;
+        else
+            foldstate_.last_heading_=7;
         Status state=turnstate_.onInit(param);
         if(state==finish)
         {
-            cout<<"turn over"<<endl;
-            Followy::Args args=Followy::Args(foldstate_.direction_,foldstate_.heading_);
+            Followy::Args args=Followy::Args(foldstate_.direction_,foldstate_.heading_,foldstate_.last_heading_);
             Tran(&followystate_,&args,0);
             return 0;
         }
@@ -233,34 +255,66 @@ Event FoldSchedule::turnFunc(Event event, StateArgs *param)
 }
 Event FoldSchedule::followyFunc(Event event, StateArgs *param)
 {
-    cout<<"follow y"<<endl;
+
     switch(event)
     {
     case Q_ENTRY_SIG:
     {
+         cout<<"followy::enter"<<endl;
         current_state=FOLLOWY_STATE;
         followystate_.onEnter(param);
         break;
     }
     case Q_INIT_SIG:
     {
-        cout<<"followy::init"<<endl;
+        if(abs(followystate_.start->x-curPos->x)==0)//在同一条线上没有变化
+            stall_count_++;
+        else
+            stall_count_=0;
         Status state=followystate_.onInit(param);
-        if(state==finish)
+        switch(state)
         {
+        case finish:
+        {
+            cout<<"followy::init state finish"<<endl;
             Move::Args args=Move::Args(foldstate_.direction_,foldstate_.heading_);
             Tran(&movestate_,&args,0);
             return 0;
+        }
+        case overclean:
+        {
+            cout<<"followy::over clean"<<endl;
+            Tran(&navstate_,nullptr,0);
+            return 0;
+        }
+        default:
+            break;
         }
         break;
     }
     case Q_LOST_WALL_SIG:
     {
-
+       if(abs(curPos->y-followystate_.starty)>1)
+       {
+           Move::Args args=Move::Args(foldstate_.direction_,foldstate_.heading_);
+           Tran(&movestate_,&args,0);
+       }
+       else
+       Status state_=followystate_.followWall();
+        return 0;
     }
     case Q_BUMP_SIG:
+    {
         cout<<"followy::bump"<<endl;
-        break;
+        if(abs(curPos->y-followystate_.starty)>1)
+        {
+            Move::Args args=Move::Args(foldstate_.direction_,foldstate_.heading_);
+            Tran(&movestate_,&args,0);
+        }
+        else
+            followystate_.bumpHandle(param);
+        return 0;
+    }
     case Q_EXIT_SIG:
         last_state=FOLLOWY_STATE;
         break;
@@ -269,45 +323,265 @@ Event FoldSchedule::followyFunc(Event event, StateArgs *param)
     }
     return event;
 }
-void FoldSchedule::run()
+Event FoldSchedule::navFunc(Event event, StateArgs *param)
+{
+    switch(event)
+    {
+    case Q_ENTRY_SIG:
+    {
+        current_state=NAV_STATE;
+        navstate_.path.clear();
+        navstate_.target.clear();
+        break;
+    }
+    case Q_INIT_SIG:
+    {
+        cout<<"nav::init"<<endl;
+        Status state=navstate_.onInit(param);
+        switch(state)
+        {
+            case success:
+            {
+                draw_path=true;
+                for(auto &iter : navstate_.path)
+                    cout<<iter<<endl;
+                 navstate_.path.pop_front();
+                return 0;
+            }
+            case clean_finish:
+            {
+                cout<<"nav::navigation failed"<<endl;
+              //  Tran(&followwallstate_,nullptr,0);
+                 Tran(&searchwallstate_,nullptr,0);
+            }
+        default:
+            break;
+        }
+        break;
+    }
+    case Q_FOLLOW_PATH_SIG:
+    {
+        cout<<"nav::follow path"<<endl;
+        if(navstate_.path.empty())
+        {
+            cout<<"nav::follow path finish,tran to move"<<endl;
+            curPos->theta=navstate_.judgeHeading();
+            foldstate_.direction_=navstate_.judgeDirection();
+            foldstate_.heading_=navstate_.judgeHeading();
+            cout<<"judge direction="<<foldstate_.direction_<<endl;
+            cout<<"judge heading="<<foldstate_.heading_<<endl;
+            Move::Args args=Move::Args(foldstate_.direction_,foldstate_.heading_);
+            Tran(&movestate_,&args,0);
+        }
+        else
+        {
+            if(navstate_.path.size()>1)
+            {
+                Point *next=new Point;
+                next=navstate_.path.front();
+                curPos->theta=(next->y-curPos->y)+(next->x-curPos->x-1)*3+8-1;//delta_y+(delta_x-1)*3+8
+                drive();
+               navstate_.path.pop_front();
+            }
+            else
+            {
+                curPos->theta=(navstate_.path.front()->y-curPos->y)+(navstate_.path.front()->x-curPos->x-1)*3+8-1;
+                drive();
+                navstate_.path.pop_front();
+            }
+        }
+        return 0;
+    }
+    case Q_BUMP_SIG:
+    {
+        cout<<"nav::bump"<<endl;
+        navstate_.onBump();
+        return 0;
+    }
+    case Q_EXIT_SIG:
+        cout<<"nav::exit"<<endl;
+        last_state=NAV_STATE;
+       // navstate_.path.clear();
+        navstate_.target.clear();
+        break;
+    default:
+        break;
+    }
+    return event;
+}
+Event FoldSchedule::followwallFunc(Event event, StateArgs *param)
+{
+    switch(event)
+    {
+    case Q_ENTRY_SIG:
+    {
+        cout<<"followwall::enter"<<endl;
+        current_state=FOLLOWWALL_STATE;
+        break;
+    }
+    case Q_INIT_SIG:
+    {
+        cout<<"followwall::init"<<endl;
+        Status state=followwallstate_.onInit(param);
+        switch(state)
+        {
+        default:
+            break;
+        }
+        break;
+    }
+    case Q_BUMP_SIG:
+    {
+        cout<<"followwall::bump"<<endl;
+        followwallstate_.bumpHandle(param);
+        return 0;
+    }
+    case Q_LOST_WALL_SIG:
+    {
+        cout<<"followwall::lost wall"<<endl;
+        followwallstate_.followWall();
+        return 0;
+    }
+    case Q_EXIT_SIG:
+        cout<<"followwall::exit"<<endl;
+        last_state=FOLLOWWALL_STATE;
+        break;
+    default:
+        break;
+    }
+    return event;
+}
+Event FoldSchedule::SearchwallFunc(Event event, StateArgs *param)
+{
+    switch(event)
+    {
+    case Q_ENTRY_SIG:
+    {
+        cout<<"searche wall::enter"<<endl;
+        current_state=SEARCH_WALL_SATATE;
+        break;
+    }
+    case Q_INIT_SIG:
+    {
+       drive();
+        break;
+    }
+    case Q_BUMP_SIG:
+    {
+        cout<<"search wall::find the wall"<<endl;
+        Tran(&followwallstate_,nullptr,0);
+        return 0;
+    }
+    case Q_EXIT_SIG:
+        cout<<"followwall::exit"<<endl;
+        last_state=SEARCH_WALL_SATATE;
+        break;
+    default:
+        break;
+    }
+    return event;
+}
+Status FoldSchedule::run()
 {
     int delta_x=body[curPos->theta]->x-curPos->x;
     int delta_y=body[curPos->theta]->y-curPos->y;
-
-    State *state=GetState();
-
-    if(state==(&movestate_))
+    int tilt=abs(delta_x)+abs(delta_y);//运动方向存在倾角状态
+    if(stall_count_>10)
     {
-        if(costmap_[body[curPos->theta]->x+delta_x*1][body[curPos->theta]->y]==8 )
-            {
-       // bump_type=3;//中间碰撞
-                cout<<"bump_sig"<<endl;
-                BumpArgs bump_args=BumpArgs(3);
-                Run(Q_BUMP_SIG,&bump_args);
-            }
-            else if(costmap_[body[curPos->theta]->x+delta_x*1][body[curPos->theta]->y+1]==8)
-            {
-                 BumpArgs bump_args=BumpArgs(2);
-            //bump_type=2;//下方发生碰撞
-                Run(Q_BUMP_SIG,&bump_args);
-            }
-            else if(costmap_[body[curPos->theta]->x+delta_x*1][body[curPos->theta]->y-1]==8)
-            {
-                BumpArgs bump_args=BumpArgs(1);
-        // bump_type=1;//上方发生碰撞
-                Run(Q_BUMP_SIG,&bump_args);
-            }
+        stall_count_=0;
+        Run(Q_STALL_SIG,0);
+        return stall;
     }
-    else if(state==(&follwystate_))
+    cout<<"stall count="<<stall_count_<<endl;
+    State *state=GetState();
+   if(state==&navstate_)
     {
-        if(costmap_[body[curPos->theta]->x+(direction_?2:-2)*(delta_y)][body[curPos->theta]->y+((direction_)?2:-2)*(delta_x)]!=8
-                &&costmap_[curPos->x+(direction_?2:-2)*(delta_y)][curPos->y+((direction_)?2:-2)*(delta_x)]!=8)
+        cout<<"run::follow path"<<endl;
+        Run(Q_FOLLOW_PATH_SIG,0);
+    }
+    if(costmap_[body[curPos->theta]->x+(delta_x)][body[curPos->theta]->y+(delta_y)]==8)//正面碰撞
+    {
+        cout<<"bump::1"<<endl;
+        BumpArgs args=BumpArgs(1);
+        Run(Q_BUMP_SIG,&args);
+    }
+    else if(delta_x==-1&&
+            (
+            (delta_y==0&&
+             (costmap_[body[curPos->theta]->x+(delta_x)][body[curPos->theta]->y+1]==8||
+            costmap_[body[curPos->theta]->x+(delta_x)][body[curPos->theta]->y-1]==8))||//判断正向上下
+            costmap_[body[curPos->theta]->x+(delta_x)][body[curPos->theta]->y+(delta_y)-delta_y*1]==8||
+            costmap_[body[curPos->theta]->x+(delta_x)][body[curPos->theta]->y+(delta_y)-delta_y*2]==8)
+            )//左边碰撞
+    {
+        cout<<"bump::2"<<endl;
+            BumpArgs args=BumpArgs(2);
+            Run(Q_BUMP_SIG,&args);
+    }
+    else if(delta_x==1&&
+            (
+                (delta_y==0&&
+                 (costmap_[body[curPos->theta]->x+(delta_x)][body[curPos->theta]->y+1]==8||
+                costmap_[body[curPos->theta]->x+(delta_x)][body[curPos->theta]->y-1]==8))||//判断正向上下
+                costmap_[body[curPos->theta]->x+(delta_x)][body[curPos->theta]->y+(delta_y)-delta_y*1]==8||
+                costmap_[body[curPos->theta]->x+(delta_x)][body[curPos->theta]->y+(delta_y)-delta_y*2]==8)
+            )//右边碰撞
+    {
+        cout<<"bump::4"<<endl;
+        BumpArgs args=BumpArgs(4);
+        Run(Q_BUMP_SIG,&args);
+    }
+    else if(delta_y==-1&&
+            (
+                (delta_x==0&&
+                 (costmap_[body[curPos->theta]->x+(delta_x)-1][body[curPos->theta]->y+(delta_y)]==8||
+                 costmap_[body[curPos->theta]->x+(delta_x)+1][body[curPos->theta]->y+(delta_y)]==8)
+                 )||//判断正向上下
+                 costmap_[body[curPos->theta]->x+(delta_x)-delta_x*1][body[curPos->theta]->y+(delta_y)]==8||
+                 costmap_[body[curPos->theta]->x+(delta_x)-delta_x*2][body[curPos->theta]->y+(delta_y)]==8))//上面碰撞
+    {
+        cout<<"bump::5"<<endl;
+        BumpArgs args=BumpArgs(5);
+        Run(Q_BUMP_SIG,&args);
+    }
+    else if(delta_y==1&&
+            (
+                (delta_x==0&&
+                 (costmap_[body[curPos->theta]->x+(delta_x)-1][body[curPos->theta]->y+(delta_y)]==8||
+                 costmap_[body[curPos->theta]->x+(delta_x)+1][body[curPos->theta]->y+(delta_y)]==8)
+                 )||//判断正向上下
+                 costmap_[body[curPos->theta]->x+(delta_x)-delta_x*1][body[curPos->theta]->y+(delta_y)]==8||
+                 costmap_[body[curPos->theta]->x+(delta_x)-delta_x*2][body[curPos->theta]->y+(delta_y)]==8))//下面碰撞
+    {
+        cout<<"bump::3"<<endl;
+        BumpArgs args=BumpArgs(3);
+        Run(Q_BUMP_SIG,&args);
+    }
+    else if((state==(&followystate_))&&(costmap_[body[curPos->theta]->x+(foldstate_.heading_==7?-2:2)*(delta_y)][body[curPos->theta]->y+((foldstate_.heading_==7)?-2:2)*(delta_x)]!=8
+                                      &&costmap_[curPos->x+(foldstate_.heading_==1?-2:2)*(delta_y)][curPos->y+((foldstate_.heading_==1)?-2:2)*(delta_x)]!=8))
+    {
+           // cout<<"lost wall\n";
             Run(Q_LOST_WALL_SIG,0);
     }
-    else
+    else if((state==(&followwallstate_))&&(abs(delta_x+delta_y)<2)&&(costmap_[body[curPos->theta]->x-2*(delta_y)][body[curPos->theta]->y+2*(delta_x)]!=8
+                                      &&costmap_[curPos->x-2*(delta_y)][curPos->y+2*(delta_x)]!=8))
     {
-        Tran(state,(StateArgs *)0,nullptr);
+            Run(Q_LOST_WALL_SIG,0);
     }
-
+    else if((state==(&followwallstate_))&&(delta_x==delta_y)&&(costmap_[curPos->x-2*(delta_y)+delta_x][curPos->y+2*(delta_x)]!=8
+                                      ||costmap_[curPos->x-2*(delta_y)][curPos->y+2*(delta_x)]!=8))
+    {
+            Run(Q_LOST_WALL_SIG,0);
+    }
+    else if((state==(&followwallstate_))&&(costmap_[curPos->x-2*(delta_y)][curPos->y+2*(delta_x)+delta_y]!=8
+                                      ||costmap_[curPos->x-2*(delta_y)][curPos->y+2*(delta_x)]!=8))
+    {
+            Run(Q_LOST_WALL_SIG,0);
+    }
+    else if(state!=&navstate_)
+    {
+     Tran(state,(StateArgs *)0,nullptr);
+    }
+    return running;
 }
 

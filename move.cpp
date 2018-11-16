@@ -14,8 +14,6 @@ Move_state::Move_state()
     curPos->y=40;
     startPos->x=curPos->x;
     startPos->y=curPos->y;
-   // stallPos->x=startPos->x;
-    //stallPos->y=startPos->y;
     curPos->theta=Direction::left;
     body=nb8(curPos);//绘制机体
     lastPos->x=curPos->x;
@@ -55,29 +53,15 @@ Point *Move_state::getPose() const
 }
 void Move_state::posUpdate()//根据curpos绘制机体,更新机体
 {
-    std::vector<Point *> nb_8=nb8(body[curPos->theta]);
-    bool pass=true;
-    for(auto &iter : nb_8)
-    {
-        if(costmap_[iter->x][iter->y]==8)
-            pass=false;
-    }
-    if(nb_8.size()==9 && pass)
-    {
-        //cout<<"move by search"<<endl;
-        lastPos->x=curPos->x;
-        lastPos->y=curPos->y;
-        curPos->x=body[curPos->theta]->x;
-        curPos->y=body[curPos->theta]->y;
-    }
-    else
-        emit stop();
+    //cout<<"pos update"<<endl;
+
     std::vector<Point *> lastBody=nb8(lastPos);//建立上一个body
     for(auto &iter :lastBody)
     {
         costmap_[iter->x][iter->y]=4;
         emit onDrawPose(iter->x,iter->y,4);
     }
+   // cout<<"pos update"<<endl;
     body=nb8(curPos);
     for(auto &iter : body)
         {
@@ -109,7 +93,24 @@ void Move_state::setCurPos(const int x, const int y)
 }
 void Move_state::fold()
 {
-    fold_schedule->run();
+    Status state=fold_schedule->run();
+    if(fold_schedule->draw_path)
+    {
+        fold_schedule->draw_path=false;
+        path=fold_schedule->navstate_.path;
+        path.push_front(curPos);
+    //绘制路径
+    Point *last=path.front();//记录上一个点
+    for (auto &p : path)
+    {
+      emit onDrawPath(last->x,last->y,p->x,p->y,1);
+        last=p;
+    }
+    }
+}
+void Move_state::fold_start()
+{
+    fold_schedule->init();
 }
 /*
 std::vector<Point *> Move::angle(Point* cur,int direc,int head)//以0位置的左边三角为基准三角:上：head=1,左：direc=1
@@ -374,7 +375,7 @@ state Move::fold_run()
                 if(costmap_[iter->x][iter->y]==8)
                  {
                    curPos->theta=right;
-                   break;
+                   break;q
                  }
 
             }
