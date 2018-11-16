@@ -22,42 +22,44 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 CONFIG += c++11
 
+INCLUDEPATH+=D:\liinyijin\astar\include\
+
 SOURCES += \
-        main.cpp \
-        mainwindow.cpp \
-    planner.cpp \
-    astar.cpp \
-    move.cpp \
-    search.cpp \
-    pose2d.cpp \
-    state.cpp \
-    hsm.cpp \
-    state_init.cpp \
-    state_move.cpp \
-    schedule_fold.cpp \
-    state_turn.cpp \
-    state_followy.cpp \
-    controller.cpp \
-    state_nav.cpp \
-    state_followwall.cpp
+        src/main.cpp \
+        src/mainwindow.cpp \
+    src/path_plan/planner.cpp \
+    src/path_plan/astar.cpp \
+    src/base_move/move.cpp \
+    src/path_plan/search.cpp \
+    src/base_move/pose2d.cpp \
+    src/state/state.cpp \
+    src/hsm.cpp \
+    src/state/state_init.cpp \
+    src/state/state_move.cpp \
+    src/schedule_fold.cpp \
+    src/state/state_turn.cpp \
+    src/state/state_followy.cpp \
+    src/base_move/controller.cpp \
+    src/state/state_nav.cpp \
+    src/state/state_followwall.cpp
 
 HEADERS += \
-        mainwindow.h \
-    astar.h \
-    planner.h \
-    move.h \
-    search.h \
-    pose2d.h \
-    state.h \
-    hsm.h \
-    state_init.h \
-    state_move.h \
-    schedule_fold.h \
-    state_turn.h \
-    state_followy.h \
-    controller.h \
-    state_nav.h \
-    state_followwall.h
+        include/mainwindow.h \
+    include/astar.h \
+    include/planner.h \
+    include/move.h \
+    include/search.h \
+    include/pose2d.h \
+    include/state.h \
+    include/hsm.h \
+    include/state_init.h \
+    include/state_move.h \
+    include/schedule_fold.h \
+    include/state_turn.h \
+    include/state_followy.h \
+    include/controller.h \
+    include/state_nav.h \
+    include/state_followwall.h
 
 FORMS += \
         mainwindow.ui
