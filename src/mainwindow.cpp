@@ -379,7 +379,7 @@ void MainWindow::on_stop_clicked()
     }
     else
     {
-        ui->stop->setText("暂停");
+        ui->stop->setText("停止");
         reStart();
         firstStop=true;
     }
