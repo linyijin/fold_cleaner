@@ -44,6 +44,7 @@ void QHsm::Run(Event event, StateArgs *param)
     State *state=cur_state;
     while(event)
     {
+        cout<<"state="<<state->name_<<endl;
         event=(this->*(state->handler_))(event,param);//状态的handler接收event处理并返回一个event
         state=state->parent_;//处理结果呈报给父节点继续处理
     }

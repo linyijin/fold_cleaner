@@ -47,7 +47,7 @@ Status Followy::onInit(StateArgs *param)
 }
 Status Followy::followWall()
 {
-    if(last_heading_==7)//左边有墙
+    if(last_heading_==7&& direction_==0)//右边有墙
     {
         switch(curPos->theta)
         {
@@ -77,7 +77,7 @@ Status Followy::followWall()
             break;
         }
     }
-    else
+    else if(last_heading_==7&&direction_==1)
     {
         switch (curPos->theta) {
         case 0:
@@ -102,6 +102,65 @@ Status Followy::followWall()
             curPos->theta=3;
             break;
         case 3:
+            curPos->theta=0;
+            break;
+        }
+    }
+    else if(last_heading_==1 && direction_==0)
+    {
+        switch (curPos->theta) {
+        case 0:
+            curPos->theta=1;
+            break;
+        case 1:
+            curPos->theta=2;
+            break;
+        case 2:
+            curPos->theta=5;
+            break;
+        case 5:
+            curPos->theta=8;
+            break;
+        case 8:
+            curPos->theta=7;
+            break;
+        case 7:
+            curPos->theta=6;
+            break;
+        case 6:
+            curPos->theta=3;
+            break;
+        case 3:
+            curPos->theta=0;
+            break;
+        }
+    }
+    if(last_heading_==1&& direction_==1)//右边有墙
+    {
+        switch(curPos->theta)
+        {
+            case 0:
+                curPos->theta=3;
+            break;
+        case 3:
+            curPos->theta=6;
+            break;
+        case 6:
+            curPos->theta=7;
+            break;
+        case 7:
+            curPos->theta=8;
+            break;
+        case 8:
+            curPos->theta=5;
+            break;
+        case 5:
+            curPos->theta=2;
+            break;
+        case 2:
+            curPos->theta=1;
+            break;
+        case 1:
             curPos->theta=0;
             break;
         }

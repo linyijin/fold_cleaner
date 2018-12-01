@@ -160,7 +160,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>reset</string>
+     <string>重新清扫</string>
     </property>
    </widget>
    <widget class="QLabel" name="label">
@@ -259,6 +259,29 @@
     </property>
     <property name="text">
      <string>停止</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_3">
+    <property name="geometry">
+     <rect>
+      <x>883</x>
+      <y>250</y>
+      <width>61</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>搜索点数目</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="search_point">
+    <property name="geometry">
+     <rect>
+      <x>960</x>
+      <y>250</y>
+      <width>111</width>
+      <height>20</height>
+     </rect>
     </property>
    </widget>
   </widget>

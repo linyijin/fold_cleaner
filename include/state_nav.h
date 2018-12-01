@@ -44,6 +44,7 @@ private:
     int direction_;
     int heading_;
     Point *end=new Point;
+    int path_fail_count;
 
 
 

@@ -42,8 +42,15 @@ Status NavState::onInit(StateArgs *param)
 
     if(path.empty())//没有路径可以到达
     {
-        return failed;
+        path_fail_count++;
+        costmap_[end->x][end->y]=8;
+        if(path_fail_count>5)
+             return failed;
+        //cout<<"path is empty"<<endl;
+        return running;//继续计算
+        //cout<<"end="<<end->x<<' '<<end->y<<' '<<costmap_[end->x][end->y]<<endl;
     }
+    path_fail_count=0;
    return success;
 }
 Status NavState::navControl()

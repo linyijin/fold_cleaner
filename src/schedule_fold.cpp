@@ -13,8 +13,10 @@ enum
     Q_STALL_SIG,
     Q_OUT_BOUND_SIG,
     Q_LOST_WALL_SIG,
-    Q_FOLLOW_PATH_SIG
+    Q_FOLLOW_PATH_SIG,
+    Q_RESEARCH_SIG
 };
+/*
 typedef enum
 {
     INIT_STATE,
@@ -28,7 +30,7 @@ typedef enum
 }StateType;
 static StateType current_state;
 static StateType last_state;
-
+*/
 
 FoldSchedule *FoldSchedule::p_inst=0;//创建一个指针
 extern std::vector<std::vector<int>> costmap_;
@@ -74,7 +76,11 @@ FoldSchedule::FoldSchedule():QHsm(),
     followwallstate_=Followwall((QHsm *)this,"followwall",(State *)(&searchwallstate_),(QFun)&FoldSchedule::followwallFunc);
 
 
-    navstate_=Navstate((QHsm *)this,"nav",(State *)0,(QFun)&FoldSchedule::navFunc);
+    navstate_=Navstate((QHsm *)this,"nav",(State *)(&foldstate_),(QFun)&FoldSchedule::navFunc);
+}
+StateType FoldSchedule::GetCurrentState()
+{
+    return current_state;
 }
 void FoldSchedule::init()
 {
@@ -267,6 +273,10 @@ Event FoldSchedule::followyFunc(Event event, StateArgs *param)
     }
     case Q_INIT_SIG:
     {
+        if(followy_count>10){
+            Tran(&navstate_,nullptr,0);
+            return 0;
+        }
         if(abs(followystate_.start->x-curPos->x)==0)//在同一条线上没有变化
             stall_count_++;
         else
@@ -316,6 +326,7 @@ Event FoldSchedule::followyFunc(Event event, StateArgs *param)
         return 0;
     }
     case Q_EXIT_SIG:
+        followy_count=0;
         last_state=FOLLOWY_STATE;
         break;
     default:
@@ -350,13 +361,20 @@ Event FoldSchedule::navFunc(Event event, StateArgs *param)
             }
             case clean_finish:
             {
-                cout<<"nav::navigation failed"<<endl;
-              //  Tran(&followwallstate_,nullptr,0);
+                cout<<"nav::clean finish"<<endl;
                  Tran(&searchwallstate_,nullptr,0);
+                 return 0;
             }
+        case failed:
+        {
+            cout<<"nav::navigation failed"<<endl;
+             Tran(&searchwallstate_,nullptr,0);
+             return 0;
+        }
         default:
             break;
         }
+
         break;
     }
     case Q_FOLLOW_PATH_SIG:
@@ -422,9 +440,14 @@ Event FoldSchedule::followwallFunc(Event event, StateArgs *param)
     case Q_INIT_SIG:
     {
         cout<<"followwall::init"<<endl;
+        wall_lost_count_=0;
         Status state=followwallstate_.onInit(param);
         switch(state)
         {
+        case success:{
+            Tran(&navstate_,nullptr,0);
+            return 0;
+        }
         default:
             break;
         }
@@ -433,13 +456,29 @@ Event FoldSchedule::followwallFunc(Event event, StateArgs *param)
     case Q_BUMP_SIG:
     {
         cout<<"followwall::bump"<<endl;
+        wall_lost_count_=0;
         followwallstate_.bumpHandle(param);
         return 0;
     }
     case Q_LOST_WALL_SIG:
     {
+        wall_lost_count_++;
         cout<<"followwall::lost wall"<<endl;
+        if(wall_lost_count_>10)//避免执行两次drive
+        {
+            wall_lost_count_=0;
+            cout<<"followwall::wall disapear"<<endl;
+             Tran(&searchwallstate_,nullptr,0);
+             return 0;
+        }
         followwallstate_.followWall();
+        return 0;
+    }
+   case Q_RESEARCH_SIG:
+    {
+        cout<<"followwall::try to find path"<<endl;
+        followwall_count=0;
+        Tran(&navstate_,nullptr,0);
         return 0;
     }
     case Q_EXIT_SIG:
@@ -464,12 +503,21 @@ Event FoldSchedule::SearchwallFunc(Event event, StateArgs *param)
     case Q_INIT_SIG:
     {
        drive();
-        break;
+        return 0;
+    }
+    case Q_RESEARCH_SIG:
+    {
+        cout<<"search wall::research"<<endl;
+        return 0;
     }
     case Q_BUMP_SIG:
     {
         cout<<"search wall::find the wall"<<endl;
         Tran(&followwallstate_,nullptr,0);
+        return 0;
+    }
+    case Q_LOST_WALL_SIG:
+    {
         return 0;
     }
     case Q_EXIT_SIG:
@@ -481,23 +529,39 @@ Event FoldSchedule::SearchwallFunc(Event event, StateArgs *param)
     }
     return event;
 }
+
+//run函数
 Status FoldSchedule::run()
 {
     int delta_x=body[curPos->theta]->x-curPos->x;
     int delta_y=body[curPos->theta]->y-curPos->y;
     int tilt=abs(delta_x)+abs(delta_y);//运动方向存在倾角状态
+    State *state=GetState();
+    if(state==&followystate_)
+        followy_count++;
+    if(state==&followwallstate_)
+    {
+        followwall_count++;
+        if(followwall_count>300)
+        {
+            cout<<"wall research"<<endl;
+            Run(Q_RESEARCH_SIG,0);
+        }
+    }
     if(stall_count_>10)
     {
+
         stall_count_=0;
         Run(Q_STALL_SIG,0);
         return stall;
     }
     cout<<"stall count="<<stall_count_<<endl;
-    State *state=GetState();
+
    if(state==&navstate_)
     {
         cout<<"run::follow path"<<endl;
         Run(Q_FOLLOW_PATH_SIG,0);
+        //return stall;
     }
     if(costmap_[body[curPos->theta]->x+(delta_x)][body[curPos->theta]->y+(delta_y)]==8)//正面碰撞
     {
@@ -560,24 +624,28 @@ Status FoldSchedule::run()
     else if((state==(&followystate_))&&(costmap_[body[curPos->theta]->x+(foldstate_.heading_==7?-2:2)*(delta_y)][body[curPos->theta]->y+((foldstate_.heading_==7)?-2:2)*(delta_x)]!=8
                                       &&costmap_[curPos->x+(foldstate_.heading_==1?-2:2)*(delta_y)][curPos->y+((foldstate_.heading_==1)?-2:2)*(delta_x)]!=8))
     {
-           // cout<<"lost wall\n";
+            //cout<<"lost wall\n";
             Run(Q_LOST_WALL_SIG,0);
     }
     else if((state==(&followwallstate_))&&(abs(delta_x+delta_y)<2)&&(costmap_[body[curPos->theta]->x-2*(delta_y)][body[curPos->theta]->y+2*(delta_x)]!=8
                                       &&costmap_[curPos->x-2*(delta_y)][curPos->y+2*(delta_x)]!=8))
     {
+           //cout<<"lost wall\n";
             Run(Q_LOST_WALL_SIG,0);
     }
     else if((state==(&followwallstate_))&&(delta_x==delta_y)&&(costmap_[curPos->x-2*(delta_y)+delta_x][curPos->y+2*(delta_x)]!=8
                                       ||costmap_[curPos->x-2*(delta_y)][curPos->y+2*(delta_x)]!=8))
     {
+         // cout<<"lost wall\n";
             Run(Q_LOST_WALL_SIG,0);
     }
     else if((state==(&followwallstate_))&&(costmap_[curPos->x-2*(delta_y)][curPos->y+2*(delta_x)+delta_y]!=8
                                       ||costmap_[curPos->x-2*(delta_y)][curPos->y+2*(delta_x)]!=8))
     {
+
             Run(Q_LOST_WALL_SIG,0);
     }
+
     else if(state!=&navstate_)
     {
      Tran(state,(StateArgs *)0,nullptr);

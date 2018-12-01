@@ -47,6 +47,7 @@ MainWindow::MainWindow(QMainWindow*parent) :
     connect(move,SIGNAL(onDrawPose(int,int,int)),this,SLOT(onDrawPose(int,int,int)));//绑定move的绘制事件
      connect(move,SIGNAL(onDrawPath(int,int,int,int,int)),this,SLOT(onDrawPath(int,int,int,int,int)));
     connect(this,SIGNAL(fold_start()),move,SLOT(fold_start()));
+    connect(this,SIGNAL(fold_start()),astar,SLOT(resetMap()));
      connect(move,SIGNAL(stop()),this,SLOT(stop()));
 
     connect(timer2,SIGNAL(timeout()),move,SLOT(fold()));
@@ -245,18 +246,18 @@ void MainWindow::mousePressEvent(QMouseEvent *e)
              }
         }
     }
-/*
-    if(e->button()==Qt::LeftButton)
-    {
-        MousePosLabel->setText(tr("障碍选择位置：")+str);
-    }
-    */
 }
 void MainWindow::on_pushButton_2_clicked()
 {
     ui->pushButton->setDisabled(false);
     ui->map->scene()->clear();//全部清除
     ui->foldstart->setDisabled(false);
+    if(!firstStop)
+    {
+        ui->stop->setText("暂停");
+        reStart();
+        firstStop=true;
+    }
     drawGridMap();
 }
 
@@ -325,28 +326,28 @@ void MainWindow::showState(int type)
     switch(type)
     {
     case 0:
-        ui->state->setPlainText("can't find path,something wrong");
+        ui->state->setPlainText("fold::init");
         break;
     case 1:
-        ui->state->setPlainText("move is running");
+        ui->state->setPlainText("enter fold:");
         break;
     case 2:
-        ui->state->setPlainText("bumps");
+        ui->state->setPlainText("move state");
         break;
     case 3:
-        ui->state->setPlainText("turn");
+        ui->state->setPlainText("turn state");
         break;
     case 4:
-        ui->state->setPlainText("follow wall");
+        ui->state->setPlainText("follow y state");
         break;
     case 5:
-         ui->state->setPlainText("over clean");
+         ui->state->setPlainText("plan for path,this may take for a long time,please wait");
         break;
     case 6:
-         ui->state->setPlainText("move over clean");
+         ui->state->setPlainText("follow wall state,if you want clean again,press the 'reset' button");
         break;
     case 7:
-         ui->state->setPlainText("path is over");
+         ui->state->setPlainText("no space area to clean,enter the follow wall state,searching for a wall to follow");
         break;
     case 8:
          ui->state->setPlainText("clean is finish");
@@ -379,7 +380,7 @@ void MainWindow::on_stop_clicked()
     }
     else
     {
-        ui->stop->setText("停止");
+        ui->stop->setText("暂停");
         reStart();
         firstStop=true;
     }

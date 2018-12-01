@@ -18,5 +18,8 @@ struct FollowWall:State
 
     void bumpHandle(StateArgs *param);
     Status followWall();
+    bool overClean();
+
+
 };
 #endif // STATE_FOLLOWWALL_H

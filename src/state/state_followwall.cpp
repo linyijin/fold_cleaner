@@ -12,6 +12,11 @@ void FollowWall::onExit(StateArgs *param)
 {}
 Status FollowWall::onInit(StateArgs *param)
 {
+    if(!overClean())
+    {
+        std::cout<<"followwall::find empty space"<<std::endl;
+        return success;
+    }
     drive();
     return running;
 }
@@ -120,7 +125,7 @@ void FollowWall::bumpHandle(StateArgs *param)
 }
 Status FollowWall::followWall()//寻找右墙
 {
-      drive();
+
    switch(curPos->theta)
    {
     case 0:
@@ -148,5 +153,20 @@ Status FollowWall::followWall()//寻找右墙
        curPos->theta=5;
        break;
    }
+     drive();
 
+}
+bool FollowWall::overClean()
+{
+    std::vector<Point *> nbr24=nb24(curPos);
+    int no_imformation_size=0;
+    for(auto &iter : nbr24)
+    {
+        if(costmap_[iter->x][iter->y]==0)
+            no_imformation_size++;
+    }
+    if(no_imformation_size<8)
+        return true;
+    else
+        return false;
 }

@@ -10,6 +10,17 @@
 #include "state_nav.h"
 #include "state_followwall.h"
 //fold状态
+typedef enum
+{
+    INIT_STATE,
+    FOLD_STATE,
+    MOVE_STATE,
+    TURN_STATE,
+    FOLLOWY_STATE,
+    NAV_STATE,
+    FOLLOWWALL_STATE,
+    SEARCH_WALL_SATATE
+}StateType;
 struct FoldState:State
 {
     struct Args:StateArgs
@@ -135,6 +146,9 @@ class FoldSchedule :public QHsm
 private:
     static FoldSchedule *p_inst;
 
+    StateType current_state;
+    StateType last_state;
+
 public:
     FoldSchedule();
     static FoldSchedule* instance()//实例化
@@ -156,6 +170,7 @@ public:
     void bumpHandle(StateArgs *param);
      void init(void);
      Status run(void);
+     StateType GetCurrentState();
 
      InitState initstate_;
      FoldState foldstate_;
@@ -171,6 +186,10 @@ public:
      int direction_;
      int heading_;
      bool draw_path;
+     bool followwall_find_space;
+     int wall_lost_count_;
+     int followwall_count;//记录沿墙时间
+     int followy_count;//记录followy时间
 
 };
 #endif // SCHEDULE_FOLD_H
