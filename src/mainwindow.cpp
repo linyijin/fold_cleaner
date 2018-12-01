@@ -40,7 +40,7 @@ MainWindow::MainWindow(QMainWindow*parent) :
     connect(astar,SIGNAL(showPath(int)),this,SLOT(showPath(int)));//绑定显示信号
     connect(astar,SIGNAL(resetAxis()),this,SLOT(resetAxis()));
     connect(astar,SIGNAL(showState(int)),this,SLOT(showState(int)));
-    connect(move,SIGNAL(showState(int)),this,SLOT(showState(int)));
+    connect(move,SIGNAL(showState(int,int)),this,SLOT(showState(int,int)));
 
     //connect(move,SIGNAL(velUpdate(int,int)),this,SLOT(VelUpdate(int,int)));//绑定运动对象更新事件
     connect(timer,SIGNAL(timeout()),move,SLOT(posUpdate()));//计数结束通知Move更新
@@ -321,7 +321,7 @@ void MainWindow::resetAxis()//清空操作要重新写
     ui->end_x->setPlainText("0");
     ui->end_y->setPlainText("0");
 }
-void MainWindow::showState(int type)
+void MainWindow::showState(int type,int count_)
 {
     switch(type)
     {
@@ -332,22 +332,25 @@ void MainWindow::showState(int type)
         ui->state->setPlainText("enter fold:");
         break;
     case 2:
-        ui->state->setPlainText("move state");
+        ui->state->setPlainText("直线");
         break;
     case 3:
-        ui->state->setPlainText("turn state");
+        ui->state->setPlainText("转向");
         break;
     case 4:
-        ui->state->setPlainText("follow y state");
+        ui->state->setPlainText("拐弯");
         break;
     case 5:
-         ui->state->setPlainText("plan for path,this may take for a long time,please wait");
+         ui->state->setPlainText("路径规划中，可能需要较长时间，请等待");
         break;
     case 6:
-         ui->state->setPlainText("follow wall state,if you want clean again,press the 'reset' button");
+    {
+        char count[2];
+         ui->state->setPlainText("沿墙清扫中,30s后将开始路径规划，若重新清扫请点击'重新清扫'");
         break;
+    }
     case 7:
-         ui->state->setPlainText("no space area to clean,enter the follow wall state,searching for a wall to follow");
+         ui->state->setPlainText("路径规划失败，寻墙");
         break;
     case 8:
          ui->state->setPlainText("clean is finish");

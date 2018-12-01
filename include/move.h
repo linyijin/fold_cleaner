@@ -38,7 +38,7 @@ signals:
     void velUpdate(const int vl,const int va);//通知主窗口更新
     void onDrawPose(int x,int y,int type);//通知画点
     void onDrawPath(int x1,int y1,int x2,int y2,int type);
-    void showState(int type);
+    void showState(int type,int count_);
     void stop();
 private slots:
     void posUpdate();//计数刷新

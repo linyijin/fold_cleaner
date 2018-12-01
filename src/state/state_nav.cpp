@@ -44,7 +44,7 @@ Status NavState::onInit(StateArgs *param)
     {
         path_fail_count++;
         costmap_[end->x][end->y]=8;
-        if(path_fail_count>5)
+        if(path_fail_count>3)
              return failed;
         //cout<<"path is empty"<<endl;
         return running;//继续计算

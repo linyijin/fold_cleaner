@@ -108,28 +108,29 @@ void Move_state::fold()
     //状态显示
     switch (fold_schedule->GetCurrentState()) {
     case INIT:
-        emit showState(0);
+        emit showState(0,-1);
         break;
    /* case FOLD:
         emit showState(1);
         break;*/
     case MOVE:
-        emit showState(2);
+        emit showState(2,-1);
         break;
     case TURN:
-        emit showState(3);
+        emit showState(3,-1);
         break;
     case FOLLOWY:
-        emit showState(4);
+        emit showState(4,-1);
         break;
     case NAV:
-        emit showState(5);
+        emit showState(5,-1);
         break;
     case FOLLOWWALL:
-        emit showState(6);
+        cout<<fold_schedule->followwall_count<<endl;
+        emit showState(6,30-fold_schedule->followwall_count);
         break;
     case SEARCH_WALL:
-        emit showState(7);
+        emit showState(7,-1);
         break;
     default:
         break;

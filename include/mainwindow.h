@@ -34,7 +34,7 @@ private slots:
     void on_end_set_button_clicked();
     void showPath(int len);//路径长度显示
     void resetAxis();//起始点信息栏显示重置
-    void showState(int type);//显示信息状态
+    void showState(int type,int count_);//显示信息状态
 
     void VelUpdate(const int vl,const int va);//接收速度设置信号
     void stop();//接收move发来的停止信号
