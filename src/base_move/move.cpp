@@ -1,5 +1,5 @@
-#include "move.h"
-#include "planner.h"
+#include "../../include/move.h"
+#include "../../include/planner.h"
 
 #include "search.h"
 #include<QtGui>

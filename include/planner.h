@@ -25,6 +25,7 @@ signals:
     void showPath(int len);
     void resetAxis();
     void showState(int type);
+    void showSum(int len,int sum);
 public slots:
     void calculate();
     void resetMap();

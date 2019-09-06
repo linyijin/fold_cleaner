@@ -1,4 +1,4 @@
-#include "hsm.h"
+#include "../include/hsm.h"
 QHsm::QHsm():
   cur_state(0),
   name_(0),

@@ -44,6 +44,7 @@ SOURCES += \
     src/state/state_followwall.cpp
 
 HEADERS += \
+    include/dstar.h \
         include/mainwindow.h \
     include/astar.h \
     include/planner.h \

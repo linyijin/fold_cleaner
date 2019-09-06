@@ -1,4 +1,4 @@
-#include "controller.h"
+#include "../../include/controller.h"
 extern std::vector<std::vector<int>> costmap_;
 extern Point* curPos;
 extern Point* lastPos;

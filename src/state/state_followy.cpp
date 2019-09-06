@@ -1,5 +1,5 @@
-#include "state_followy.h"
-#include "controller.h"
+#include "../../include/state_followy.h"
+#include "../../include/controller.h"
 
 #include<vector>
 extern Point *curPos;
@@ -166,6 +166,7 @@ Status Followy::followWall()
         }
     }
    drive();
+   return running;
 }
 void Followy::bumpHandle(StateArgs *param)
 {

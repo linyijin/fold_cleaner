@@ -39,6 +39,7 @@ private slots:
     void VelUpdate(const int vl,const int va);//接收速度设置信号
     void stop();//接收move发来的停止信号
     void reStart();
+    void showSum(int len,int sum);
 
   //  void posUpdate();
 

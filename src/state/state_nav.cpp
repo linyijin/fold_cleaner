@@ -1,4 +1,4 @@
-#include "state_nav.h"
+#include "../../include/state_nav.h"
 extern std::vector<std::vector<int>> costmap_;
 extern Point* curPos;
 extern Point* lastPos;
@@ -113,4 +113,5 @@ Status NavState::onBump()
     astar->setEnd(end->x,end->y);
     astar->calculate();
     path=astar->returnPath();
+    return running;
 }

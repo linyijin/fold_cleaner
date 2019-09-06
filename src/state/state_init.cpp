@@ -1,4 +1,4 @@
-#include "state_init.h"
+#include "../../include/state_init.h"
 Init::Init()
 {}
 Init::Init(const Init&rhs):State(rhs)

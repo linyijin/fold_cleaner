@@ -1,4 +1,4 @@
-#include "astar.h"
+#include "../../include/astar.h"
 #include<iostream>
 #include<math.h>
 
@@ -73,6 +73,7 @@ std::vector<Point *> Astar_1::nb_8(Point *cur)//找下一个点
             if (inMap(p) && !isInList(p,closelist) && map_[p->x][p->y]!=8)//选取在地图中，不在close中的八近邻,open创建了一个新的副本，要注意区别
             {
                 nbr.push_back(new Point(p->x, p->y));
+                searchFild.push_back(p);
             }
             delete p;
         }
@@ -102,7 +103,7 @@ Point * Astar_1::findPath(Point start_, Point end_)
     {
         //std::cout<<openlist.size()<<std::endl;
         auto current = getLeastPoint(openlist);//取出最小F值的open
-        //cout<<current->x<<' '<<current->y<<endl;
+        cout<<"cur="<<current->x<<' '<<current->y<<endl;
         openlist.remove(current);
         closelist.push_back(current);
         auto nbr = nb_8(current);
@@ -110,7 +111,8 @@ Point * Astar_1::findPath(Point start_, Point end_)
         {
             continue;//没有八近邻，不计算
         }
-       // std::cout<<"find nb8"<<std::endl;
+        std::cout<<"find nb8"<<std::endl;
+        cout<<"nbr="<<nbr.size()<<endl;
         for (auto &iter : nbr)//iter取出的是原来的值？
         {
             if (map_[iter->x][iter->y] == 8)//跳过障碍
@@ -126,7 +128,7 @@ Point * Astar_1::findPath(Point start_, Point end_)
             //   passable=true;
             if(passable)//八近邻有障碍，不能通过
             {
-               // std::cout<<"not a passable point"<<std::endl;
+                std::cout<<"not a passable point"<<std::endl;
                 continue;
             }
             if (!isInList(iter,openlist))//不在openlist中

@@ -1,8 +1,8 @@
-#include "mainwindow.h"
+#include "../include/mainwindow.h"
 #include "ui_mainwindow.h"
-#include "planner.h"
-#include "move.h"
-#include "pose2d.h"
+#include "../include/planner.h"
+#include "../include/move.h"
+#include "../include/pose2d.h"
 
 #include<cstdlib>
 #include<QtGui>//mousetrack
@@ -10,6 +10,8 @@
 #include<iostream>
 #include<QTextStream>
 #include<stdio.h>
+#include<stdlib.h>
+#include<string>
 #include<QTWidgets/QVBoxLayout>
 
 std::vector<std::vector<int>> costmap_(80, std::vector<int>(80, 0));
@@ -51,6 +53,7 @@ MainWindow::MainWindow(QMainWindow*parent) :
      connect(move,SIGNAL(stop()),this,SLOT(stop()));
 
     connect(timer2,SIGNAL(timeout()),move,SLOT(fold()));
+    connect(astar,SIGNAL(showSum(int,int)),this,SLOT(showSum(int,int)));
 
 
 
@@ -312,7 +315,7 @@ void MainWindow::showPath(int len)
 {
     char string_len[5];
     itoa(len,string_len,10);
-    ui->path->setText(string_len);
+    //ui->path->setText(string_len);
 }
 void MainWindow::resetAxis()//清空操作要重新写
 {
@@ -388,6 +391,13 @@ void MainWindow::on_stop_clicked()
         firstStop=true;
     }
 
+}
+void MainWindow::showSum(int len,int sum)
+{
+    QString lenstr=QString::number(len);
+    QString sumstr=QString::number(sum);
+    QString str=QString(lenstr+'='+sumstr);
+    ui->path->setText(str);
 }
 void MainWindow::stop()
 {

@@ -1,4 +1,4 @@
-#include "planner.h"
+#include "../../include/planner.h"
 
 #include<iostream>
 #include<math.h>
@@ -43,12 +43,14 @@ void Astar::calculate()//相当于main函数
         emit showState(0);
       //  resetMap();
     }
+    int sum_=astar_1.sum;
     //std::cout<<"success"<<path_.size()<<std::endl;
     path_len=path_.size();
     for(auto &iter : path_)//把点直接放入数组
     {
         path.push_back(iter);
     }
+    emit showSum(path_len,sum_);
     emit showPath(path_len);//发送路径长度
     Point *last=path_.front();//记录上一个点
     for (auto &p : path_)
@@ -56,7 +58,11 @@ void Astar::calculate()//相当于main函数
       emit onDrawPath(last->x,last->y,p->x,p->y,1);
         last=p;
      //costmap_[p->x][p->y] = 1;
-    }
+    }/*
+    for(auto &p:astar_1.searchFild)
+    {
+        costmap_[p->x][p->y]=4;
+    }*/
     costmap_[start.x][start.y]=2;
     costmap_[end.x][end.y]=4;
     for(int i=0;i<80;i++){

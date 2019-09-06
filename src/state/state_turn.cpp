@@ -1,4 +1,4 @@
-#include "state_turn.h"
+#include "../../include/state_turn.h"
 extern Point *curPos;
 extern Point *lastPos;
 Turn::Turn():

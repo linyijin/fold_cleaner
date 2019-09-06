@@ -1,5 +1,5 @@
-#include "state_move.h"
-#include "controller.h"
+#include "../../include/state_move.h"
+#include "../../include/controller.h"
 extern Point *curPos;//全局记录变量
 extern Point *lastPos;
 extern std::vector<Point *> body;

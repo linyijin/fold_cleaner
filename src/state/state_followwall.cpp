@@ -1,5 +1,5 @@
-#include "state_followwall.h"
-#include "controller.h"
+#include "../../include/state_followwall.h"
+#include "../../include/controller.h"
 #include<iostream>
 #include<vector>
 extern Point *curPos;//全局记录变量
@@ -154,7 +154,7 @@ Status FollowWall::followWall()//寻找右墙
        break;
    }
      drive();
-
+    return running;
 }
 bool FollowWall::overClean()
 {

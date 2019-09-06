@@ -13,6 +13,7 @@ public:
     int sum = 0;//记录总里程
     void initAstar(std::vector<std::vector<int>> &map);
     std::list<Point *> getPath(Point start, Point end);
+    std::vector<Point *> searchFild;
 private:
     int calG(Point *p,Point *start);
     int calF(Point *p);
@@ -26,5 +27,6 @@ private:
     std::vector<std::vector<int>> map_;//地图数据
     Point *getLeastPoint(std::list<Point*> p);
     Point * findPath(Point start, Point end);
+
 };
 #endif // ASTAR_H

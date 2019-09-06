@@ -1,5 +1,5 @@
-#include "schedule_fold.h"
-#include "controller.h"
+#include "../include/schedule_fold.h"
+#include "../include/controller.h"
 #include<vector>
 #include<iostream>
 using std::cout;
