@@ -19,7 +19,9 @@ int Astar_1::calH(Point *p, Point *end)
 }
 int Astar_1::calF(Point *p)
 {
-    return p->F = p->G + p->H;
+    //return p->F =0* p->G + p->H;
+    //return p->F =0.2* p->G + 0.8*p->H;
+    return p->F =0.5* p->G + 0.5*p->H;
 }
 bool Astar_1::inMap(Point *p)
 {
@@ -141,14 +143,15 @@ Point * Astar_1::findPath(Point start_, Point end_)
                 //std::cout << "out openlist" << std::endl;
                 //std::cout << "x=" << iter->x << "y=" << iter->y << ' ' << iter->G << std::endl;
                 openlist.push_back(iter);
+                searchFild.push_back(iter);//记录搜索点
             }
             else
             {
 
                 int tempG=calG(iter, current);//从current计算
+                //int tempF=calF(iter);
                 Point *temp = isInList(iter, openlist);//应该取出open中保持的值进行比较
                 if (tempG < temp->G)//更新G值和F值
-                //if (tempG < iter->G)//更新G值和F值
                 {
                     iter->G = tempG;
                     iter->F = calF(iter);

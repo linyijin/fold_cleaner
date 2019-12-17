@@ -353,6 +353,7 @@ Event FoldSchedule::navFunc(Event event, StateArgs *param)
         {
             case success:
             {
+                plan_count++;
                 draw_path=true;
                 for(auto &iter : navstate_.path)
                     cout<<iter<<endl;

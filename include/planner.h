@@ -29,6 +29,7 @@ signals:
 public slots:
     void calculate();
     void resetMap();
+    void reClean();
     //void resetMapStart();
     void resetMapEnd();
     void  obstacleset(int x,int y);

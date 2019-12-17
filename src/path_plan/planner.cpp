@@ -1,5 +1,5 @@
 #include "../../include/planner.h"
-
+#include "time.h"
 #include<iostream>
 #include<math.h>
 //extern std::vector<std::vector<int>> costmap_(80, std::vector<int>(80, 0));//定义一个接收地图的函数
@@ -34,6 +34,7 @@ void Astar::setEnd(int end_x,int end_y)
 }
 void Astar::calculate()//相当于main函数
 {
+    clock_t tiemStart=clock();//计时开始
     Astar_1 astar_1;
     astar_1.initAstar(costmap_);
     std::list<Point *>path_=astar_1.getPath(start, end);
@@ -43,6 +44,9 @@ void Astar::calculate()//相当于main函数
         emit showState(0);
       //  resetMap();
     }
+    clock_t timeFinish=clock();
+    double duration=(double)(timeFinish-tiemStart)/CLOCKS_PER_SEC;
+    cout<<"during time is"<<duration<<endl;
     int sum_=astar_1.sum;
     //std::cout<<"success"<<path_.size()<<std::endl;
     path_len=path_.size();
@@ -55,22 +59,26 @@ void Astar::calculate()//相当于main函数
     Point *last=path_.front();//记录上一个点
     for (auto &p : path_)
     {
-      emit onDrawPath(last->x,last->y,p->x,p->y,1);
+      emit onDrawPath(last->x,last->y,p->x,p->y,1);//修改规划路径颜色
         last=p;
      //costmap_[p->x][p->y] = 1;
-    }/*
-    for(auto &p:astar_1.searchFild)
+    }
+    int searchCount=0;
+    for(auto &p:astar_1.searchFild)//绘制搜索区域
     {
         costmap_[p->x][p->y]=4;
-    }*/
+    }
     costmap_[start.x][start.y]=2;
     costmap_[end.x][end.y]=4;
     for(int i=0;i<80;i++){
         for(int j=0;j<80;j++)
         {
+            if(costmap_[i][j]==4)
+                searchCount++;
              emit onDrawPose(i,j,costmap_[i][j]);//给mainwidow绘制
         }
     }
+    cout<<"search Filed is"<<searchCount<<endl;
 
 }
 void Astar::obstacleset(int x, int y)
@@ -86,6 +94,23 @@ void Astar::resetMap()
             if(i==0 || j==0||i==79 ||j==79)
                 costmap_[i][j]=8;
             else
+                costmap_[i][j]=0;
+             emit onDrawPose(i,j,costmap_[i][j]);//给mainwidow绘制
+
+        }
+    }
+    emit showPath(0);
+    emit resetAxis();
+}
+void Astar::reClean()
+{
+   // cout<<"reset map"<<endl;
+    for(int i=0;i<80;i++){
+        for(int j=0;j<80;j++)
+        {
+            if(i==0 || j==0||i==79 ||j==79)
+                costmap_[i][j]=8;
+            else if(costmap_[i][j]!=8)
                 costmap_[i][j]=0;
              emit onDrawPose(i,j,costmap_[i][j]);//给mainwidow绘制
 

@@ -150,11 +150,11 @@
      </rect>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton_2">
+   <widget class="QPushButton" name="reClean">
     <property name="geometry">
      <rect>
-      <x>100</x>
-      <y>150</y>
+      <x>90</x>
+      <y>230</y>
       <width>75</width>
       <height>31</height>
      </rect>
@@ -239,7 +239,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>200</y>
+      <y>240</y>
       <width>75</width>
       <height>51</height>
      </rect>
@@ -252,13 +252,72 @@
     <property name="geometry">
      <rect>
       <x>100</x>
-      <y>210</y>
+      <y>270</y>
       <width>51</width>
       <height>23</height>
      </rect>
     </property>
     <property name="text">
      <string>停止</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="resetMap">
+    <property name="geometry">
+     <rect>
+      <x>90</x>
+      <y>150</y>
+      <width>75</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>重置地图</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="area">
+    <property name="geometry">
+     <rect>
+      <x>960</x>
+      <y>270</y>
+      <width>113</width>
+      <height>20</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_3">
+    <property name="geometry">
+     <rect>
+      <x>890</x>
+      <y>270</y>
+      <width>54</width>
+      <height>12</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>清扫面积</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="planCount">
+    <property name="geometry">
+     <rect>
+      <x>960</x>
+      <y>230</y>
+      <width>113</width>
+      <height>20</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_4">
+    <property name="geometry">
+     <rect>
+      <x>890</x>
+      <y>230</y>
+      <width>54</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>规划次数</string>
     </property>
    </widget>
   </widget>
