@@ -93,6 +93,7 @@ void Move_state::posUpdate()//根据curpos绘制机体,更新机体
                 emit onDrawPose(iter->x,iter->y,1);//机体其他部分绘制为蓝色
             }
         }
+    emit onDrawPath(lastPos->x,lastPos->y,curPos->x,curPos->y,1);//绘制路线
 }
 void Move_state::setCurPos(const int x, const int y)
 {
@@ -106,6 +107,7 @@ void Move_state::fold()
 {
     Status state=fold_schedule->run();
     //状态显示
+    emit showPlanCount(fold_schedule->plan_count);
     switch (fold_schedule->GetCurrentState()) {
     case INIT:
         emit showState(0,-1);

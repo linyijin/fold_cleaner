@@ -27,7 +27,7 @@ private slots:
     void onDrawPose(int x,int y,int type);
     void onDrawPath(int x1,int y1,int x2,int y2,int type);
 
-    void on_pushButton_2_clicked();
+    //void on_pushButton_2_clicked();
 
     void on_start_set_button_clicked();
 
@@ -35,11 +35,12 @@ private slots:
     void showPath(int len);//路径长度显示
     void resetAxis();//起始点信息栏显示重置
     void showState(int type,int count_);//显示信息状态
-
     void VelUpdate(const int vl,const int va);//接收速度设置信号
     void stop();//接收move发来的停止信号
     void reStart();
     void showSum(int len,int sum);
+    void showArea();
+    void showPlanCount(int _count);
 
   //  void posUpdate();
 
@@ -48,6 +49,10 @@ private slots:
 
 
     void on_stop_clicked();
+
+    void on_resetMap_clicked();
+
+    void on_reClean_clicked();
 
 protected:
     void mousePressEvent(QMouseEvent *e);//添加按键检测事件，用于障碍物添加

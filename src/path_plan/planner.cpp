@@ -55,11 +55,12 @@ void Astar::calculate()//相当于main函数
     Point *last=path_.front();//记录上一个点
     for (auto &p : path_)
     {
-      emit onDrawPath(last->x,last->y,p->x,p->y,1);
+      emit onDrawPath(last->x,last->y,p->x,p->y,1);//修改规划路径颜色
         last=p;
      //costmap_[p->x][p->y] = 1;
-    }/*
-    for(auto &p:astar_1.searchFild)
+    }
+   // cout<<"搜索区域="<<astar_1.searchFild.size()<<endl;
+    /*for(auto &p:astar_1.searchFild)//绘制搜索区域
     {
         costmap_[p->x][p->y]=4;
     }*/
@@ -86,6 +87,23 @@ void Astar::resetMap()
             if(i==0 || j==0||i==79 ||j==79)
                 costmap_[i][j]=8;
             else
+                costmap_[i][j]=0;
+             emit onDrawPose(i,j,costmap_[i][j]);//给mainwidow绘制
+
+        }
+    }
+    emit showPath(0);
+    emit resetAxis();
+}
+void Astar::reClean()
+{
+   // cout<<"reset map"<<endl;
+    for(int i=0;i<80;i++){
+        for(int j=0;j<80;j++)
+        {
+            if(i==0 || j==0||i==79 ||j==79)
+                costmap_[i][j]=8;
+            else if(costmap_[i][j]!=8)
                 costmap_[i][j]=0;
              emit onDrawPose(i,j,costmap_[i][j]);//给mainwidow绘制
 

@@ -40,6 +40,7 @@ signals:
     void onDrawPath(int x1,int y1,int x2,int y2,int type);
     void showState(int type,int count_);
     void stop();
+    void showPlanCount(int _planCount);
 private slots:
     void posUpdate();//计数刷新
     void fold();

@@ -190,6 +190,7 @@ public:
      int wall_lost_count_;
      int followwall_count;//记录沿墙时间
      int followy_count;//记录followy时间
+     int plan_count;//记录规划次数
 
 };
 #endif // SCHEDULE_FOLD_H

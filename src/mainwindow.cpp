@@ -35,7 +35,8 @@ MainWindow::MainWindow(QMainWindow*parent) :
     //绑定信号/槽
    // connect(ui->pushButton,SIGNAL(clicked()),astar,SLOT(setStart(int,int,int,int)));//设置起点终点
     connect(ui->pushButton,SIGNAL(clicked()),astar,SLOT(calculate()));
-    connect(ui->pushButton_2,SIGNAL(clicked()),astar,SLOT(resetMap()));
+    connect(ui->reClean,SIGNAL(clicked()),astar,SLOT(reClean()));
+    connect(ui->resetMap,SIGNAL(clicked()),astar,SLOT(resetMap()));
     connect(this,SIGNAL(obstacleset(int,int)),astar,SLOT(obstacleset(int,int)));//绑定当前函数与astar的函数
     connect(astar,SIGNAL(onDrawPose(int,int,int)),this,SLOT(onDrawPose(int,int,int)));
     connect(astar,SIGNAL(onDrawPath(int,int,int,int,int)),this,SLOT(onDrawPath(int,int,int,int,int)));
@@ -48,6 +49,7 @@ MainWindow::MainWindow(QMainWindow*parent) :
     connect(timer,SIGNAL(timeout()),move,SLOT(posUpdate()));//计数结束通知Move更新
     connect(move,SIGNAL(onDrawPose(int,int,int)),this,SLOT(onDrawPose(int,int,int)));//绑定move的绘制事件
      connect(move,SIGNAL(onDrawPath(int,int,int,int,int)),this,SLOT(onDrawPath(int,int,int,int,int)));
+    connect(move,SIGNAL(showPlanCount(int)),this,SLOT(showPlanCount(int)));
     connect(this,SIGNAL(fold_start()),move,SLOT(fold_start()));
     connect(this,SIGNAL(fold_start()),astar,SLOT(resetMap()));
      connect(move,SIGNAL(stop()),this,SLOT(stop()));
@@ -250,19 +252,7 @@ void MainWindow::mousePressEvent(QMouseEvent *e)
         }
     }
 }
-void MainWindow::on_pushButton_2_clicked()
-{
-    ui->pushButton->setDisabled(false);
-    ui->map->scene()->clear();//全部清除
-    ui->foldstart->setDisabled(false);
-    if(!firstStop)
-    {
-        ui->stop->setText("暂停");
-        reStart();
-        firstStop=true;
-    }
-    drawGridMap();
-}
+
 
 void MainWindow::on_start_set_button_clicked()//设置起点
 {
@@ -390,7 +380,7 @@ void MainWindow::on_stop_clicked()
         reStart();
         firstStop=true;
     }
-
+    showArea();
 }
 void MainWindow::showSum(int len,int sum)
 {
@@ -398,6 +388,24 @@ void MainWindow::showSum(int len,int sum)
     QString sumstr=QString::number(sum);
     QString str=QString(lenstr+'='+sumstr);
     ui->path->setText(str);
+}
+void MainWindow::showArea()//显示清扫区域面积
+{
+    int _area=0;
+    for(int i=0;i<80;i++){
+        for(int j=0;j<80;j++)
+        {
+             if(costmap_[i][j]==4)
+                 _area++;
+        }
+    }
+    QString _strArea=QString::number(_area);
+    ui->area->setText(_strArea);
+}
+void MainWindow::showPlanCount(int count)//显示规划路径次数
+{
+    QString _strPlan=QString::number(count);
+    ui->planCount->setText(_strPlan);
 }
 void MainWindow::stop()
 {
@@ -408,4 +416,23 @@ void MainWindow::reStart()
 {
     timer2->start();
     timer->start();
+}
+
+void MainWindow::on_resetMap_clicked()
+{
+    //ui->map->scene()->clear();
+}
+
+void MainWindow::on_reClean_clicked()
+{
+    ui->pushButton->setDisabled(false);
+   // ui->map->scene()->clear();//全部清除
+    ui->foldstart->setDisabled(false);
+    if(!firstStop)
+    {
+        ui->stop->setText("暂停");
+        reStart();
+        firstStop=true;
+    }
+    drawGridMap();
 }
