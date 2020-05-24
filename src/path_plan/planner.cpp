@@ -65,6 +65,7 @@ void Astar::calculate()//相当于main函数
     }
     int searchCount=0;
     for(auto &p:astar_1.searchFild)//绘制搜索区域
+
     {
         costmap_[p->x][p->y]=4;
     }

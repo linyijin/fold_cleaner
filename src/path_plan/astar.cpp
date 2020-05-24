@@ -19,6 +19,7 @@ int Astar_1::calH(Point *p, Point *end)
 }
 int Astar_1::calF(Point *p)
 {
+
     //return p->F =0* p->G + p->H;
     //return p->F =0.2* p->G + 0.8*p->H;
     return p->F =0.5* p->G + 0.5*p->H;
